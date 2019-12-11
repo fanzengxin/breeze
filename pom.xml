@@ -17,7 +17,7 @@
 
     <repositories>
         <repository>
-            <!-- Maven 自带的中央仓库使用的Id为central 如果其他的仓库声明也是用该Id就会覆盖中央仓库的配置 -->
+            <!-- Maven 私服 -->
             <id>nexus</id>
             <name>Nexus Repository</name>
             <url>http://192.168.2.100:8081/repository/maven-public/</url>

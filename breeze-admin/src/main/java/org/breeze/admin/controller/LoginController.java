@@ -32,6 +32,10 @@ public class LoginController {
      * @return
      */
     @Permission(login = false)
+    @Params({
+            @Param(name="id", description="用户ID", format = ParamFormatCheck.Int),
+            @Param(name="name", description="用户名", required = true, format = ParamFormatCheck.Int)
+    })
     @Api(value = "login", method = RequestMethod.POST)
     public String login(int id, String name, String value, Serial serial) {
         System.out.println(loginService.getLoginUser(id, name, value, serial));
