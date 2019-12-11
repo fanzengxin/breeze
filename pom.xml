@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.breeze</groupId>
+    <artifactId>parent</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0.0</version>
+    <description>breeze框架父级目录</description>
+
+    <modules>
+        <module>breeze-admin</module>
+        <module>breeze-core</module>
+    </modules>
+
+    <repositories>
+        <repository>
+            <!-- Maven 自带的中央仓库使用的Id为central 如果其他的仓库声明也是用该Id就会覆盖中央仓库的配置 -->
+            <id>nexus</id>
+            <name>Nexus Repository</name>
+            <url>http://192.168.2.100:8081/repository/maven-public/</url>
+        </repository>
+    </repositories>
+
+    <!--定义全局常量-->
+    <properties>
+        <!--字符编码集-->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!--java编译版本-->
+        <java.compiler.version>1.8</java.compiler.version>
+
+        <!--maven插件版本-->
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
+        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+        <maven-dependency-plugin.version>3.1.0</maven-dependency-plugin.version>
+        <maven-war-plugin.version>3.2.3</maven-war-plugin.version>
+
+        <!--web基础模块信息常量-->
+        <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
+        <log4j2.version>2.11.1</log4j2.version>
+        <disruptor.version>3.4.2</disruptor.version>
+
+        <!--dom4j-->
+        <dom4j.version>1.6</dom4j.version>
+        <jaxen.version>1.1.6</jaxen.version>
+
+        <!--commons模块-->
+        <commons.version>3.7</commons.version>
+        <commons-collections4.version>4.1</commons-collections4.version>
+        <commons-beanutils.version>1.9.3</commons-beanutils.version>
+        <commons-codec.version>1.10</commons-codec.version>
+        <commons-dbutils.version>1.6</commons-dbutils.version>
+        <commons-io.version>2.6</commons-io.version>
+        <commons-fileupload.version>1.3.3</commons-fileupload.version>
+        <commons-pool.version>2.5.0</commons-pool.version>
+        <cglib.version>3.2.10</cglib.version>
+        <jedis.version>3.1.0</jedis.version>
+
+        <!--网络模块-->
+        <httpclient.version>4.5.7</httpclient.version>
+        <!--cglib-->
+        <cglib.version>3.2.10</cglib.version>
+        <!--druid数据库连接池-->
+        <druid.version>1.1.13</druid.version>
+        <!--JSON-->
+        <fastjson.version>1.2.62</fastjson.version>
+        <!--redis-jedis-->
+        <jedis.version>3.1.0</jedis.version>
+        <!--yml文件解析-->
+        <yaml.version>1.25</yaml.version>
+
+        <!--MySql-->
+        <mysql.version>8.0.18</mysql.version>
+
+    </properties>
+
+    <!--定义jar包依赖-->
+    <dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${javax.servlet-api.version}</version>
+        </dependency>
+
+        <!--log4j2 日志-->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j2.version}</version>
+        </dependency>
+
+        <!--异步日志并发用到的jar-->
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>${disruptor.version}</version>
+        </dependency>
+
+        <!--HttpClient-->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpclient.version}</version>
+        </dependency>
+
+        <!--cglib方法-->
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>${cglib.version}</version>
+        </dependency>
+
+        <!--druid数据库连接池-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>${druid.version}</version>
+        </dependency>
+
+        <!--JSON-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
+        </dependency>
+
+        <!--redis客户端-->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>${jedis.version}</version>
+        </dependency>
+
+
+        <!-- yaml格式文件解析 -->
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>${yaml.version}</version>
+        </dependency>
+
+        <!--MySql-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--maven编译插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <!--指定编译JDK版本-->
+                    <source>${java.compiler.version}</source>
+                    <target>${java.compiler.version}</target>
+                    <!--指定编译文件格式-->
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <compilerArgument>-parameters</compilerArgument>
+                </configuration>
+            </plugin>
+            <!--测试插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <log4j.configuration>logback.xml</log4j.configuration>
+                    </systemPropertyVariables>
+                    <!--忽略单元测试的错误，继续构建代码-->
+                    <testFailureIgnore>true</testFailureIgnore>
+                </configuration>
+            </plugin>
+        </plugins>
+
+        <!--maven 资源文件打包配置-->
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <!--发布除java包下properties和xml文件-->
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                    <include>**/*.yml</include>
+                </includes>
+                <!-- 是否替换资源中的属性-->
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <!-- 是否替换资源中的属性。即使用pom.xml里面配置的properties替换别的地方的${xxx}引用-->
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+</project>

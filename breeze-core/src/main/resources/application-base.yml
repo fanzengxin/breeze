@@ -1,0 +1,72 @@
+######################################################################
+# 基础信息
+######################################################################
+base:
+
+
+######################################################################
+# 系统安全
+######################################################################
+security:
+  secretKey: 'breezeBase201912' #系统密钥
+
+######################################################################
+# 数据库
+######################################################################
+database:
+  default:
+    # 连接驱动
+    driverClassName: 'com.mysql.cj.jdbc.Driver'
+    # 连接地址
+    url: 'jdbc:mysql://192.168.2.100:3306/breeze?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true'
+    # 用户名
+    username: 'root'
+    # 密码
+    password: 'xVgm3GI2rn7qs2hW/N2UnQ=='
+    # 初始连接数
+    initialSize: 5
+    # 最大连接数
+    maxActive: 20
+    # 最小空闲
+    minIdle: 5
+    # 最长等待时间
+    maxWait: 600000
+    # 销毁线程检测连接间隔
+    timeBetweenEvictionRunsMillis: 600000
+    minEvictableIdleTimeMillis: 600000
+    # 验证的SQL语句
+    validationQuery: SELECT 1
+    # 检测连接是否有效
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    # 是否缓存preparedStatement，也就是PSCache
+    poolPreparedStatements: true
+    # 要启用PSCache，必须配置大于0
+    maxOpenPreparedStatements: 100
+    # 每个PSCache的大小
+    maxPoolPreparedStatementPerConnectionSize: 50
+    removeAbandoned: true
+    removeAbandonedTimeout: 1800
+    logAbandoned: true
+######################################################################
+# 缓存Redis
+######################################################################
+redis:
+  default:
+    host: 192.168.2.100
+    port: 6379
+    password: 'xVgm3GI2rn7qs2hW/N2UnQ=='
+    max_active: 1024 # 可用连接实例的最大数目，默认值为8；如果赋值为-1，则表示不限制；如果pool已经分配了maxActive个jedis实例，则此时pool的状态为exhausted(耗尽)。
+    max_idle: 200 # 控制一个pool最多有多少个状态为idle(空闲的)的jedis实例，默认值也是8。
+    max_wait: 10000 # 等待可用连接的最大时间，单位毫秒，默认值为-1，表示永不超时。如果超过等待时间，则直接抛出JedisConnectionException；
+    timeout: 10000  # 超时时间
+
+######################################################################
+# 响应码
+######################################################################
+response:
+  code:
+    0: '请求成功'
+    10000: ''
+    10001: ''

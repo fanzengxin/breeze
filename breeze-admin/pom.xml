@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>parent</artifactId>
+        <groupId>org.breeze</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.breeze</groupId>
+    <artifactId>breeze-admin</artifactId>
+    <packaging>war</packaging>
+    <version>1.0.0</version>
+    <description>系统管理模块</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.breeze</groupId>
+            <artifactId>breeze-core</artifactId>
+            <version>${version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>ROOT</finalName>
+        <plugins>
+            <!-- 修改webapp目录为WebContent -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>${maven-war-plugin.version}</version>
+                <configuration>
+                    <!--war包名称-->
+                    <warName>ROOT</warName>
+                    <!-- 设置../parent/out/artifacts/ROOT为web项目输出路径 -->
+                    <webappDirectory>../out/artifacts/ROOT</webappDirectory>
+                    <!-- 设置webapps为web目录 -->
+                    <warSourceDirectory>src/main/webapps</warSourceDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
