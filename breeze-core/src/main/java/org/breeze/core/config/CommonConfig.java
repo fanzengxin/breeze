@@ -130,7 +130,7 @@ public class CommonConfig {
         if (!isInit) {
             initConfig();
         }
-        String time = BaseConfig.baseConfig.get("server.secret.key");
+        String time = BaseConfig.baseConfig.get("base.login.alive-time");
         if (UtilString.isNotEmpty(time)) {
             return Integer.parseInt(time);
         } else {

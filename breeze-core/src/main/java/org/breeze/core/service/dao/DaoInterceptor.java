@@ -64,6 +64,7 @@ public class DaoInterceptor implements MethodInterceptor {
         Connection conn = null;
         Serial serial = null;
         Parameter[] parameters = method.getParameters();
+        method.getReturnType();
         for (int i = 0; i < objects.length; i++) {
             if (objects[i] instanceof Connection) {
                 // 处理service层传过来的数据库链接
@@ -110,7 +111,19 @@ public class DaoInterceptor implements MethodInterceptor {
         if (UtilString.isNullOrEmpty(tableName)) {
             tableName = repository.tableName();
         }
-        return doRepository(conn, select, instance, fieldParam, classParam, tableName, serial);
+        Object result = doRepository(conn, select, instance, fieldParam, classParam, tableName, serial);
+        if (method.getReturnType().equals(Data.class) && result instanceof DataList) {
+            DataList dl = (DataList)result;
+            if (dl.size() == 0) {
+                return null;
+            } else if (dl.size() == 1) {
+                return dl.getData(0);
+            } else {
+                log.logError("单数据查询结果为多记录", serial);
+                throw new DBException("单数据查询结果为多记录");
+            }
+        }
+        return result;
     }
 
     /**
@@ -256,10 +269,10 @@ public class DaoInterceptor implements MethodInterceptor {
         String execute = result.get("sql").toString();
         if (count) {
             // 统计查询总数
-            return ide.findSql(execute, pageSize, page, ((List)(result.get("param"))).toArray());
+            return ide.findSqlPage(execute, pageSize, page, ((List)(result.get("param"))).toArray());
         } else {
             // 不统计查询总数
-            return ide.findSql(execute, pageSize, page, SQL_FIND_NOT_COUNT, ((List)(result.get("param"))).toArray());
+            return ide.findSqlPage(execute, pageSize, page, SQL_FIND_NOT_COUNT, ((List)(result.get("param"))).toArray());
         }
     }
 

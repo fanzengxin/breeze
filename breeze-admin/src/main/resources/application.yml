@@ -2,5 +2,3 @@ base: # 基本信息
   node:
     id: 'admin'
     name: '基础通用模块'
-
-

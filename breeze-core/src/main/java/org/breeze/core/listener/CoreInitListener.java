@@ -31,7 +31,7 @@ public class CoreInitListener implements ServletContextListener {
         CommonConfig.serverInit(event);
         // 加载所有系统实体类
         BeanFactory.scanAnnotationBean();
-        // 初始化系统响应码至内存
+        // 初始化系统响应码
         ResponseCode.initCodeMap();
         log.logInfo("[ 系统初始化 ] 完成...", serial);
     }

@@ -8,6 +8,7 @@ import org.apache.commons.io.IOUtils;
 import org.breeze.core.bean.api.ApiConfig;
 import org.breeze.core.bean.api.BeanFactory;
 import org.breeze.core.bean.api.MethodParameter;
+import org.breeze.core.bean.api.R;
 import org.breeze.core.bean.log.Serial;
 import org.breeze.core.bean.login.LoginInfo;
 import org.breeze.core.bean.login.LoginSession;
@@ -46,8 +47,8 @@ public class DispatcherFilter implements Filter {
     private static final int MEMORY_THRESHOLD = 1024 * 1024 * 3;
 
     // 数据验证正则
-    private static Pattern intFormat = Pattern.compile("(\\-|\\+)\\d");
-    private static Pattern numFormat = Pattern.compile("(\\-|\\+)?\\d+(\\.\\d+)?");
+    private static Pattern intFormat = Pattern.compile("-?\\d+");
+    private static Pattern numFormat = Pattern.compile("-?\\d+(\\.\\d+)?");
     private static Pattern dateFormat = Pattern.compile("[1-9]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])");
     private static Pattern timeFormat = Pattern.compile("(20|21|22|23|[0-1]\\d):[0-5]\\d:[0-5]\\d");
     private static Pattern datetimeFormat = Pattern.compile("[1-9]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])\\s+(20|21|22|23|[0-1]\\d):[0-5]\\d:[0-5]\\d");
@@ -78,11 +79,11 @@ public class DispatcherFilter implements Filter {
         String url = hsr.getServletPath();
         Serial serial = new Serial(url);
         ServletContext context = filterConfig.getServletContext();
-        log.logInfo("请求接入：{}", serial, url);
+        log.logInfo("接入请求：{}", serial, url);
         long startTime = UtilDateTime.currentTimeMillis();
         doExecute(hsr, hsq, context, url, serial);
         long endTime = UtilDateTime.currentTimeMillis();
-        log.logInfo("请求结束，耗时：{}ms", serial, String.valueOf(endTime - startTime));
+        log.logInfo("结束请求，耗时：{}ms", serial, String.valueOf(endTime - startTime));
     }
 
 
@@ -102,13 +103,13 @@ public class DispatcherFilter implements Filter {
             if (apiBean == null) {
                 // 指定URL的实例不存在
                 log.logInfo("未配置的url地址：{}", serial, url);
-                printJSON(response, ResponseCode.ERROR_API_URL);
+                printString(response, R.failure(ResponseCode.ERROR_API_URL));
                 return;
             }
             // 判断实例方法是否符合要求
             if (UtilString.isNotEmpty(apiBean.getAllowMethod()) && !request.getMethod().equalsIgnoreCase(apiBean.getAllowMethod())) {
-                log.logInfo("未经许可的请求方法：{}", serial, request.getMethod());
-                printJSON(response, ResponseCode.ERROR_API_METHOD);
+                log.logInfo("未经许可的请求方式：{}", serial, request.getMethod());
+                printString(response, R.failure(ResponseCode.ERROR_API_METHOD));
                 return;
             }
             // 根据实例配置获取指定的class
@@ -126,20 +127,22 @@ public class DispatcherFilter implements Filter {
             Map<String, Object> checkResult = checkData(apiBean, request, response, context, serial);
             if (checkResult.get("error") != null) {
                 // 请求参数验证失败
-                printJSON(response, checkResult.get("error").toString());
+                printString(response, R.failure((int)checkResult.get("error")));
             } else {
                 // 根据指定参数获取对应方法，同时注入方法参数
                 List<Class<?>> classList = (List<Class<?>>) checkResult.get("class");
                 // 获取指定请求参数的方法对象
                 Method runMethod = action.getMethod(apiBean.getMethod(), classList.toArray(new Class<?>[classList.size()]));
                 // 反射执行方法
-                String result = (String) runMethod.invoke(instance, ((List<Object>) checkResult.get("value")).toArray(new Object[classList.size()]));
+                R result = (R) runMethod.invoke(instance, ((List<Object>) checkResult.get("value")).toArray(new Object[classList.size()]));
                 // 返回执行结果
-                printString(response, result);
+                if (result != null) {
+                    printString(response, result);
+                }
             }
         } catch (Exception e) {
             log.logInfo("系统异常", serial, e);
-            printJSON(response, ResponseCode.SYSTEM_ERROR);
+            printString(response, R.failure(ResponseCode.SYSTEM_ERROR));
         }
     }
 
@@ -162,13 +165,13 @@ public class DispatcherFilter implements Filter {
             if (loginInfo == null) {
                 log.logInfo("用户未登录", serial);
                 // 用户未登录
-                result.put("error", ResponseCode.USER_NO_LOGIN);
+                result.put("error", ResponseCode.LOGIN_STATUS_NO_LOGIN);
                 return result;
             }
             if (LoginSession.checkUserLocked(loginInfo.getUserId(), serial)) {
                 log.logInfo("用户{}账户被锁定", serial, loginInfo.getUserId());
                 // 账户锁定
-                result.put("error", ResponseCode.USER_LOCKED_LOGIN);
+                result.put("error", ResponseCode.LOGIN_STATUS_LOCKED);
                 return result;
             }
         }
@@ -187,12 +190,12 @@ public class DispatcherFilter implements Filter {
                 // 空参数验证
                 if (mp.isRequired() && (value == null || "".equals(value.toString()))) {
                     log.logInfo("用户参数{}不能为空", serial, mp.getName());
-                    result.put("error", ResponseCode.PARAM_CHECK_FAILURE);
+                    result.put("error", ResponseCode.ERROR_API_PARAM_CHECK);
                     return result;
                 }
-                if (mp.getFormat() != ParamFormatCheck.String && !formatCheck(value, mp.getFormat())) {
+                if (value != null && "".equals(value.toString()) && mp.getFormat() != ParamFormatCheck.String && !formatCheck(value, mp.getFormat())) {
                     log.logInfo("用户参数{}格式验证失败", serial, mp.getName());
-                    result.put("error", ResponseCode.PARAM_CHECK_FAILURE);
+                    result.put("error", ResponseCode.ERROR_API_PARAM_CHECK);
                     return result;
                 }
                 // 默认值
@@ -202,25 +205,25 @@ public class DispatcherFilter implements Filter {
                 // 最大长度
                 if (mp.getMaxLength() != -1 && value != null && mp.getMaxLength() < value.toString().length()) {
                     log.logInfo("用户参数{}={}大于最大长度{}", serial, mp.getName(), value, mp.getMaxLength());
-                    result.put("error", ResponseCode.PARAM_CHECK_FAILURE);
+                    result.put("error", ResponseCode.ERROR_API_PARAM_CHECK);
                     return result;
                 }
                 // 最小长度
                 if (mp.getMinLength() != -1 && value != null && mp.getMinLength() > value.toString().length()) {
                     log.logInfo("用户参数{}={}小于最小长度{}", serial, mp.getName(), value, mp.getMinLength());
-                    result.put("error", ResponseCode.PARAM_CHECK_FAILURE);
+                    result.put("error", ResponseCode.ERROR_API_PARAM_CHECK);
                     return result;
                 }
                 // 最大值
                 if (mp.getMaxValue() != -1 && value != null && new BigDecimal(mp.getMaxValue()).compareTo(new BigDecimal(value.toString())) == -1) {
                     log.logInfo("用户参数{}={}大于最大值{}", serial, mp.getName(), value, mp.getMaxValue());
-                    result.put("error", ResponseCode.PARAM_CHECK_FAILURE);
+                    result.put("error", ResponseCode.ERROR_API_PARAM_CHECK);
                     return result;
                 }
                 // 最小值
                 if (mp.getMinValue() != -1 && value != null && new BigDecimal(mp.getMinValue()).compareTo(new BigDecimal(value.toString())) == 1) {
                     log.logInfo("用户参数{}={}小于最小值{}", serial, mp.getName(), value, mp.getMinValue());
-                    result.put("error", ResponseCode.PARAM_CHECK_FAILURE);
+                    result.put("error", ResponseCode.ERROR_API_PARAM_CHECK);
                     return result;
                 }
             }
@@ -357,77 +360,107 @@ public class DispatcherFilter implements Filter {
      * @param serial
      */
     private Map<String, Object> setParamToMap(HttpServletRequest request, Serial serial) {
-        Map<String, Object> paramMap = new HashMap<String, Object>();
         if (ServletFileUpload.isMultipartContent(request)) {
-            // 配置上传参数
-            DiskFileItemFactory factory = new DiskFileItemFactory();
-            // 设置内存临界值 - 超过后将产生临时文件并存储于临时目录中
-            factory.setSizeThreshold(MEMORY_THRESHOLD);
-            // 设置临时存储目录
-            factory.setRepository(new File(System.getProperty("java.io.tmpdir")));
-            ServletFileUpload upload = new ServletFileUpload(factory);
-            // 多媒体上传
-            try {
-                List<FileItem> formItems = upload.parseRequest(request);
-                if (formItems != null && formItems.size() > 0) {
-                    // 迭代表单数据
-                    for (FileItem item : formItems) {
-                        // 处理不在表单中的字段
-                        if (item.isFormField()) {
-                            paramMap.put(item.getFieldName(), item.getString());
-                        } else {//如果fileitem中封装的是上传文件
-                            // 得到上传的文件名称，
-                            String filename = item.getName();
-                            log.logDebug("上传文件名:{}", serial, filename);
-                            if (filename == null || filename.trim().equals("")) {
-                                continue;
-                            }
-                            // 注意：不同的浏览器提交的文件名是不一样的，有些浏览器提交上来的文件名是带有路径的，如：  c:\a\b\1.txt，而有些只是单纯的文件名，如：1.txt
-                            // 处理获取到的上传文件的文件名的路径部分，只保留文件名部分
-                            filename = filename.substring(filename.lastIndexOf("\\") + 1);
-                            //获取item中的上传文件的输入流
-                            InputStream in = item.getInputStream();
-                            //创建一个文件输出流
-                            FileOutputStream out = new FileOutputStream("\\" + filename);
-                            //创建一个缓冲区
-                            byte buffer[] = new byte[1024];
-                            //判断输入流中的数据是否已经读完的标识
-                            int len = 0;
-                            //循环将输入流读入到缓冲区当中，(len=in.read(buffer))>0就表示in里面还有数据
-                            while ((len = in.read(buffer)) > 0) {
-                                //使用FileOutputStream输出流将缓冲区的数据写入到指定的目录(savePath + "\\" + filename)当中
-                                out.write(buffer, 0, len);
-                            }
-                            //关闭输入流
-                            in.close();
-                            //关闭输出流
-                            out.close();
-                            //删除处理文件上传时生成的临时文件
-                            item.delete();
+            // 如果包含多媒体参数
+            return getMultipartContentMap(request, serial);
+        } else {
+            // 常规请求参数
+            return getCommonMap(request, serial);
+        }
+    }
+
+    /**
+     * 获取多媒体上传参数
+     *
+     * @param request
+     * @param serial
+     * @return
+     */
+    private Map<String, Object> getMultipartContentMap(HttpServletRequest request, Serial serial) {
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+        // 配置上传参数
+        DiskFileItemFactory factory = new DiskFileItemFactory();
+        // 设置内存临界值 - 超过后将产生临时文件并存储于临时目录中
+        factory.setSizeThreshold(MEMORY_THRESHOLD);
+        // 设置临时存储目录
+        factory.setRepository(new File(System.getProperty("java.io.tmpdir")));
+        ServletFileUpload upload = new ServletFileUpload(factory);
+        // 多媒体上传
+        try {
+            List<FileItem> formItems = upload.parseRequest(request);
+            if (formItems != null && formItems.size() > 0) {
+                // 迭代表单数据
+                for (FileItem item : formItems) {
+                    // 处理不在表单中的字段
+                    if (item.isFormField()) {
+                        paramMap.put(item.getFieldName(), item.getString());
+                    } else {//如果fileitem中封装的是上传文件
+                        // 得到上传的文件名称，
+                        String filename = item.getName();
+                        log.logDebug("上传文件名:{}", serial, filename);
+                        if (filename == null || filename.trim().equals("")) {
+                            continue;
                         }
+                        // 注意：不同的浏览器提交的文件名是不一样的，有些浏览器提交上来的文件名是带有路径的，如：  c:\a\b\1.txt，而有些只是单纯的文件名，如：1.txt
+                        // 处理获取到的上传文件的文件名的路径部分，只保留文件名部分
+                        filename = filename.substring(filename.lastIndexOf("\\") + 1);
+                        //获取item中的上传文件的输入流
+                        InputStream in = item.getInputStream();
+                        //创建一个文件输出流
+                        FileOutputStream out = new FileOutputStream("\\" + filename);
+                        //创建一个缓冲区
+                        byte buffer[] = new byte[1024];
+                        //判断输入流中的数据是否已经读完的标识
+                        int len = 0;
+                        //循环将输入流读入到缓冲区当中，(len=in.read(buffer))>0就表示in里面还有数据
+                        while ((len = in.read(buffer)) > 0) {
+                            //使用FileOutputStream输出流将缓冲区的数据写入到指定的目录(savePath + "\\" + filename)当中
+                            out.write(buffer, 0, len);
+                        }
+                        //关闭输入流
+                        in.close();
+                        //关闭输出流
+                        out.close();
+                        //删除处理文件上传时生成的临时文件
+                        item.delete();
                     }
                 }
-            } catch (Exception e) {
-                log.logError("获取多媒体post请求参数失败", serial, e);
             }
-        } else {
-            // 普通key value
-            Enumeration names = request.getParameterNames();
-            while (names.hasMoreElements()) {
-                String name = names.nextElement().toString();
-                paramMap.put(name, request.getParameter(name));
+        } catch (Exception e) {
+            log.logError("获取多媒体post请求参数失败", serial, e);
+        }
+        return paramMap;
+    }
+
+    /**
+     * 获取常规请求参数
+     *
+     * @param request
+     * @param serial
+     * @return
+     */
+    private Map<String, Object> getCommonMap(HttpServletRequest request, Serial serial) {
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+        // 普通key value
+        Enumeration names = request.getParameterNames();
+        while (names.hasMoreElements()) {
+            String name = names.nextElement().toString();
+            paramMap.put(name, request.getParameter(name));
+        }
+        // post body 体参数
+        String data = null;
+        try {
+            InputStream input = request.getInputStream();
+            data = IOUtils.toString(input, "UTF-8");
+            String contentType = request.getContentType();
+            if (UtilString.isNullOrEmpty(contentType)) {
+                contentType = "";
             }
-            // 普通json
-            String data = null;
-            try {
-                InputStream input = request.getInputStream();
-                data = IOUtils.toString(input, "UTF-8");
-                if (UtilString.isNotEmpty(data)) {
-                    paramMap.putAll(JSONObject.parseObject(data).getInnerMap());
-                }
-            } catch (IOException e) {
-                log.logInfo("解析json格式的请求参数失败：{}", serial, data);
+            if (UtilString.isNotEmpty(data) && contentType.toUpperCase().contains("application/json".toUpperCase())) {
+                paramMap.putAll(JSONObject.parseObject(data).getInnerMap());
             }
+        } catch (IOException e) {
+            log.logInfo("解析json格式的请求参数失败：{}", serial, data);
         }
         return paramMap;
     }
@@ -436,35 +469,9 @@ public class DispatcherFilter implements Filter {
      * 返回处理结果
      *
      * @param response
-     * @param code
+     * @param result
      */
-    private void printJSON(HttpServletResponse response, String code) {
-        printJSON(response, code, null);
-    }
-
-    /**
-     * 返回处理结果
-     *
-     * @param response
-     * @param code
-     */
-    private void printJSON(HttpServletResponse response, String code, String data) {
-        StringBuffer sb = new StringBuffer();
-        sb.append("{\"code\":\"").append(code).append("\",\"msg\":\"").append(ResponseCode.getResponseMsg(code)).append("\"");
-        if (UtilString.isNotEmpty(data)) {
-            sb.append(",\"data\":\"").append(data).append("\"");
-        }
-        sb.append("}");
-        printString(response, sb.toString());
-    }
-
-    /**
-     * 返回处理结果
-     *
-     * @param response
-     * @param msg
-     */
-    private void printString(HttpServletResponse response, String msg) {
+    private void printString(HttpServletResponse response, R result) {
         String encoding = CommonConfig.getEncoding();
         response.addHeader("Content-Type", "text/html;charset=" + encoding);
         response.setContentType("text/html;charset=" + encoding);
@@ -472,7 +479,7 @@ public class DispatcherFilter implements Filter {
         PrintWriter out = null;
         try {
             out = response.getWriter();
-            out.write(msg);
+            out.write(result.toString());
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {

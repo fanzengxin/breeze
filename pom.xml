@@ -13,6 +13,7 @@
     <modules>
         <module>breeze-admin</module>
         <module>breeze-core</module>
+        <module>breeze-module</module>
     </modules>
 
     <repositories>

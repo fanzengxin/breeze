@@ -1,0 +1,6 @@
+base: # 基本信息
+  node:
+    id: 'generator'
+    name: '代码生成器'
+
+

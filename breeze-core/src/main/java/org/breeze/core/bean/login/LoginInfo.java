@@ -24,6 +24,8 @@ public class LoginInfo {
     private String phoneNum;
     // 用户邮箱
     private String eMail;
+    // 登录状态 0=正常，1=用户名不存在，2=密码错误，3=用户禁用，4=用户被锁定
+    private int loginStatus = 0;
     // 用户状态 0正常，1锁定，2禁用
     private int userStatus = 0;
     // 登录时间
@@ -36,16 +38,17 @@ public class LoginInfo {
     private Set<String> dept = null;
     // 用户权限
     private Set<String> permissions = null;
-    // 用户接口资源
-    private Set<String> resources = null;
 
     public LoginInfo() {
 
     }
 
+    public LoginInfo(int loginStatus) {
+        this.loginStatus = loginStatus;
+    }
+
     public LoginInfo(String uid, String userId, String userName, String gender, String phoneNum,
-                     String eMail, Set<String> role, Set<String> dept, Set<String> permissions,
-                     Set<String> resources) {
+                     String eMail, Set<String> role, Set<String> dept, Set<String> permissions) {
         this.uid = uid;
         this.userId = userId;
         this.userName = userName;
@@ -55,7 +58,6 @@ public class LoginInfo {
         this.role = role;
         this.dept = dept;
         this.permissions = permissions;
-        this.resources = resources;
     }
 
     public String getUid() {
@@ -130,14 +132,6 @@ public class LoginInfo {
         this.permissions = permissions;
     }
 
-    public Set<String> getResources() {
-        return resources;
-    }
-
-    public void setResources(Set<String> resources) {
-        this.resources = resources;
-    }
-
     public int getUserStatus() {
         return userStatus;
     }
@@ -160,6 +154,14 @@ public class LoginInfo {
 
     public void setLoginIP(String loginIP) {
         this.loginIP = loginIP;
+    }
+
+    public int getLoginStatus() {
+        return loginStatus;
+    }
+
+    public void setLoginStatus(int loginStatus) {
+        this.loginStatus = loginStatus;
     }
 
     /**
@@ -212,14 +214,6 @@ public class LoginInfo {
                 info.append(",");
             }
             info.append(permissionsStr);
-        }
-        info.append("\"");
-        info.append(",\"resources\":\"");
-        for (String resourcesStr : this.role) {
-            if (!",".equalsIgnoreCase(info.substring(info.length()-1, info.length()))) {
-                info.append(",");
-            }
-            info.append(resourcesStr);
         }
         info.append("\"}");
         return info.toString();
