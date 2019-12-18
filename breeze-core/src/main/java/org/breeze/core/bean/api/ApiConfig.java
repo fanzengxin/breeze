@@ -2,7 +2,6 @@ package org.breeze.core.bean.api;
 
 import org.breeze.core.utils.string.UtilString;
 
-import java.lang.reflect.Parameter;
 import java.util.List;
 
 /**
@@ -36,12 +35,25 @@ public class ApiConfig {
     // 是否需要进行签名验证
     private boolean sign;
 
-    public ApiConfig() {}
+    public ApiConfig() {
+    }
 
     public ApiConfig(String mapping, boolean singleton, String api, String className, String method, String allowMethod,
                      String description, List<MethodParameter> parameters, String permissionCode, boolean login, boolean sign) {
+        if (mapping.startsWith("/")) {
+            mapping = mapping.substring(1);
+        }
+        if (mapping.endsWith("/")) {
+            mapping = mapping.substring(0, mapping.length() - 1);
+        }
         this.mapping = mapping;
         this.singleton = singleton;
+        if (api.startsWith("/")) {
+            api = api.substring(1);
+        }
+        if (api.endsWith("/")) {
+            api = api.substring(0, api.length() - 1);
+        }
         this.api = api;
         this.className = className;
         this.method = method;
@@ -63,29 +75,16 @@ public class ApiConfig {
 
     /**
      * 封装请求url
+     *
      * @return
      */
     public String getUrl() {
-        if (UtilString.isNullOrEmpty(mapping) && UtilString.isNullOrEmpty(api)) {
-            return null;
-        }
         StringBuffer sb = new StringBuffer("/service");
-        if (!UtilString.startWith(mapping, "/")) {
-            sb.append("/");
+        if (UtilString.isNotEmpty(mapping)) {
+            sb.append("/").append(mapping);
         }
-        sb.append(mapping);
-        if (UtilString.endWith(sb.toString(), "/")) {
-            if (UtilString.startWith(api, "/")) {
-                sb.append(UtilString.subString(api, 1));
-            } else {
-                sb.append(api);
-            }
-        } else {
-            if (UtilString.startWith(api, "/")) {
-                sb.append(api);
-            } else {
-                sb.append("/").append(api);
-            }
+        if (UtilString.isNotEmpty(api)) {
+            sb.append("/").append(api);
         }
         return sb.toString();
     }

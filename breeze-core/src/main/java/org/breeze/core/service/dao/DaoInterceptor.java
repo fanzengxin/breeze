@@ -106,12 +106,7 @@ public class DaoInterceptor implements MethodInterceptor {
             log.logError("获取Dao层Reository注解失败", serial);
             throw new DBException("获取Dao层Reository注解失败");
         }
-        // 数据表名
-        String tableName = select.tableName();
-        if (UtilString.isNullOrEmpty(tableName)) {
-            tableName = repository.tableName();
-        }
-        Object result = doRepository(conn, select, instance, fieldParam, classParam, tableName, serial);
+        Object result = doRepository(conn, select, instance, fieldParam, classParam, repository, serial);
         if (method.getReturnType().equals(Data.class) && result instanceof DataList) {
             DataList dl = (DataList)result;
             if (dl.size() == 0) {
@@ -134,12 +129,12 @@ public class DaoInterceptor implements MethodInterceptor {
      * @param instance   执行实例对象
      * @param fieldParam 按参数名Map
      * @param classParam 按参数类型Map
-     * @param tableName  数据表明
+     * @param repository  数据表明
      * @param serial     日志唯一序列
      * @return
      */
     private Object doRepository(Connection conn, Select select, Class<?> instance, Map<String, Object> fieldParam,
-                                Map<Class<?>, List<Object>> classParam, String tableName, Serial serial) {
+                                Map<Class<?>, List<Object>> classParam, Repository repository, Serial serial) {
         try {
             if (conn == null) {
                 conn = ConnectionManager.getConnection();
@@ -165,16 +160,16 @@ public class DaoInterceptor implements MethodInterceptor {
                         return -1;
                     }
                     // 批量保存
-                    int btSave = batchSave(ide, tableName, (DataList) bsList.get(0));
+                    int btSave = batchSave(ide, repository, (DataList) bsList.get(0));
                     emptyCacheData(instance, serial);
                     return btSave;
                 case OperationMethod.SAVE:
-                    List sList = classParam.get(DataList.class);
+                    List sList = classParam.get(Data.class);
                     if (sList == null || sList.size() == 0) {
-                        return -1;
+                        return false;
                     }
                     // 单条保存
-                    boolean save = save(ide, tableName, (Data) sList.get(0));
+                    boolean save = save(ide, repository, (Data) sList.get(0));
                     emptyCacheData(instance, serial);
                     return save;
                 case OperationMethod.BATCH_UPDATE:
@@ -183,16 +178,16 @@ public class DaoInterceptor implements MethodInterceptor {
                         return -1;
                     }
                     // 批量更新
-                    int btUpdate = batchUpdate(ide, tableName, (DataList) buList.get(0));
+                    int btUpdate = batchUpdate(ide, repository, (DataList) buList.get(0));
                     emptyCacheData(instance, serial);
                     return btUpdate;
                 case OperationMethod.UPDATE:
-                    List uList = classParam.get(DataList.class);
+                    List uList = classParam.get(Data.class);
                     if (uList == null || uList.size() == 0) {
                         return -1;
                     }
                     // 单条更新
-                    boolean update = update(ide, tableName, (Data) uList.get(0));
+                    boolean update = update(ide, repository, (Data) uList.get(0));
                     emptyCacheData(instance, serial);
                     return update;
                 case OperationMethod.BATCH_REMOVE:
@@ -201,16 +196,16 @@ public class DaoInterceptor implements MethodInterceptor {
                         return -1;
                     }
                     // 批量删除
-                    int btRemove = batchRemove(ide, tableName, (DataList) brList.get(0));
+                    int btRemove = batchRemove(ide, repository, (DataList) brList.get(0));
                     emptyCacheData(instance, serial);
                     return btRemove;
                 case OperationMethod.REMOVE:
-                    List rList = classParam.get(DataList.class);
+                    List rList = classParam.get(Data.class);
                     if (rList == null || rList.size() == 0) {
                         return -1;
                     }
                     // 单条删除
-                    int remove = remove(ide, tableName, (Data) rList.get(0));
+                    int remove = remove(ide, repository, (Data) rList.get(0));
                     emptyCacheData(instance, serial);
                     return remove;
                 default:
@@ -280,19 +275,22 @@ public class DaoInterceptor implements MethodInterceptor {
      * 批量保存数据
      *
      * @param ide
-     * @param tableName
+     * @param repository
      * @param batchSave
      * @return
      * @throws DBException
      */
-    private int batchSave(IDataExecute ide, String tableName, DataList batchSave) throws DBException {
+    private int batchSave(IDataExecute ide, Repository repository, DataList batchSave) throws DBException {
+        String tableName = repository.tableName();
         if (batchSave != null && batchSave.size() > 0) {
             for (int i = 0; i < batchSave.size(); i++) {
                 Data create = batchSave.getData(i);
                 if (i == 0 && UtilString.isNotEmpty(tableName)) {
                     create.setEntityName(tableName);
                 }
-                create.add("create_time", UtilDateTime.currentTimeMillis());
+                if (repository.createTime()) {
+                    create.add("create_time", UtilDateTime.currentTimeMillis());
+                }
             }
             return ide.batchCreate(batchSave);
         }
@@ -303,17 +301,20 @@ public class DaoInterceptor implements MethodInterceptor {
      * 保存数据
      *
      * @param ide
-     * @param tableName
+     * @param repository
      * @param save
      * @return
      * @throws DBException
      */
-    private boolean save(IDataExecute ide, String tableName, Data save) throws DBException {
+    private boolean save(IDataExecute ide, Repository repository, Data save) throws DBException {
+        String tableName = repository.tableName();
         if (save != null) {
             if (UtilString.isNotEmpty(tableName)) {
                 save.setEntityName(tableName);
             }
-            save.add("create_time", UtilDateTime.currentTimeMillis());
+            if (repository.createTime()) {
+                save.add("create_time", UtilDateTime.currentTimeMillis());
+            }
             Data data = ide.create(save);
             if (data != null) {
                 return true;
@@ -326,19 +327,22 @@ public class DaoInterceptor implements MethodInterceptor {
      * 批量更新数据
      *
      * @param ide
-     * @param tableName
+     * @param repository
      * @param batchUpdate
      * @return
      * @throws DBException
      */
-    private int batchUpdate(IDataExecute ide, String tableName, DataList batchUpdate) throws DBException {
+    private int batchUpdate(IDataExecute ide, Repository repository, DataList batchUpdate) throws DBException {
+        String tableName = repository.tableName();
         if (batchUpdate != null && batchUpdate.size() > 0) {
             for (int i = 0; i < batchUpdate.size(); i++) {
                 Data update = batchUpdate.getData(i);
                 if (i == 0 && UtilString.isNotEmpty(tableName)) {
                     update.setEntityName(tableName);
                 }
-                update.add("update_time", UtilDateTime.currentTimeMillis());
+                if (repository.updateTime()) {
+                    update.add("update_time", UtilDateTime.currentTimeMillis());
+                }
             }
             return ide.batchStore(batchUpdate);
         }
@@ -349,17 +353,20 @@ public class DaoInterceptor implements MethodInterceptor {
      * 更新数据
      *
      * @param ide
-     * @param tableName
+     * @param repository
      * @param update
      * @return
      * @throws DBException
      */
-    private boolean update(IDataExecute ide, String tableName, Data update) throws DBException {
+    private boolean update(IDataExecute ide, Repository repository, Data update) throws DBException {
+        String tableName = repository.tableName();
         if (update != null) {
             if (UtilString.isNotEmpty(tableName)) {
                 update.setEntityName(tableName);
             }
-            update.add("update_time", UtilDateTime.currentTimeMillis());
+            if (repository.updateTime()) {
+                update.add("update_time", UtilDateTime.currentTimeMillis());
+            }
             Data data = ide.store(update);
             if (data != null) {
                 return true;
@@ -372,12 +379,13 @@ public class DaoInterceptor implements MethodInterceptor {
      * 批量删除数据
      *
      * @param ide
-     * @param tableName
+     * @param repository
      * @param batchRemove
      * @return
      * @throws DBException
      */
-    private int batchRemove(IDataExecute ide, String tableName, DataList batchRemove) throws DBException {
+    private int batchRemove(IDataExecute ide, Repository repository, DataList batchRemove) throws DBException {
+        String tableName = repository.tableName();
         if (batchRemove != null && batchRemove.size() > 0) {
             if (UtilString.isNotEmpty(tableName)) {
                 batchRemove.getData(0).setEntityName(tableName);
@@ -391,12 +399,13 @@ public class DaoInterceptor implements MethodInterceptor {
      * 删除数据
      *
      * @param ide
-     * @param tableName
+     * @param repository
      * @param remove
      * @return
      * @throws DBException
      */
-    private int remove(IDataExecute ide, String tableName, Data remove) throws DBException {
+    private int remove(IDataExecute ide, Repository repository, Data remove) throws DBException {
+        String tableName = repository.tableName();
         if (remove != null) {
             remove.setEntityName(tableName);
             return ide.remove(remove);

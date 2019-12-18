@@ -1,6 +1,7 @@
 package org.breeze.core.bean.data;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import org.breeze.core.log.Log;
 import org.breeze.core.log.LogFactory;
@@ -250,7 +251,7 @@ public class DataList extends ArrayList {
     }
 
     /**
-     * json数据转dataList
+     * json数组转dataList
      *
      * @param jsonStr
      * @return
@@ -265,7 +266,7 @@ public class DataList extends ArrayList {
             JSONArray ja = json.getJSONArray("dataList");
             for (int i = 0; i < ja.size(); i++) {
                 JSONObject js = ja.getJSONObject(i);
-                Data data = Data.parseData(js);
+                Data data = Data.parseData(js, null);
                 dataList.add(data);
             }
             return dataList;
@@ -273,6 +274,50 @@ public class DataList extends ArrayList {
             log.logError("字符串转DataList失败：{}", e, jsonStr);
         }
         return null;
+    }
+
+    /**
+     * json数组转dataList
+     *
+     * @param jsonStr
+     * @return
+     */
+    public static DataList parseDataList(String jsonStr, String pk, String... field) {
+        try {
+            JSONArray jsonArray = JSONArray.parseArray(jsonStr);
+            return parseDataList(jsonArray, pk, field);
+        } catch (Exception e) {
+            log.logInfo("json解析失败");
+            throw new JSONException("20010");
+        }
+    }
+
+    /**
+     * json数组转dataList
+     *
+     * @param jsonArray
+     * @param pk
+     * @param field
+     * @return
+     */
+    public static DataList parseDataList(JSONArray jsonArray, String pk, String... field) {
+        DataList dataList = new DataList();
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JSONObject js = jsonArray.getJSONObject(i);
+            Data data = Data.parseData(js, pk, field);
+            dataList.add(data);
+        }
+        return dataList;
+    }
+
+    /**
+     * 判断dataList是否为空
+     *
+     * @param dataList
+     * @return
+     */
+    public static boolean isNotEmpty(DataList dataList) {
+        return dataList == null && dataList.size() > 0;
     }
 
     public String toString() {

@@ -1,7 +1,6 @@
-package org.breeze.admin.service;
+package ${code_package}.service;
 
-import org.breeze.admin.dao.LoginDao;
-import org.breeze.admin.dao.UserDao;
+import ${code_package}.dao.${code_function}Dao;
 import org.breeze.core.annotation.common.AutoAdd;
 import org.breeze.core.annotation.service.Service;
 import org.breeze.core.bean.data.Data;
@@ -10,24 +9,23 @@ import org.breeze.core.bean.log.Serial;
 import org.breeze.core.bean.login.LoginInfo;
 import org.breeze.core.log.Log;
 import org.breeze.core.log.LogFactory;
-import org.breeze.core.utils.date.UtilDateTime;
 
 /**
- * @Description: 用户管理
- * @Auther: 黑面阿呆
- * @Date: 2019-12-17 17:14
+ * @Description: ${desc_function}
+ * @Auther: ${desc_username}
+ * @Date: ${desc_datetime}
  * @Version: 1.0.0
  */
 @Service
-public class UserService {
+public class ${code_function}Service {
 
-    private static final Log log = LogFactory.getLog(UserService.class);
+    private static final Log log = LogFactory.getLog(${code_function}Service.class);
 
     @AutoAdd
-    private UserDao userDao;
+    private ${code_function}Dao ${code_function_low}Dao;
 
     /**
-     * 分页查询用户列表
+     * 分页查询${desc_function}列表
      *
      * @param page
      * @param pageSize
@@ -35,24 +33,24 @@ public class UserService {
      * @return
      */
     public DataList getPage(int page, int pageSize, Serial serial) {
-        return userDao.getPage(page, pageSize, serial);
+        return ${code_function_low}Dao.getPage(page, pageSize, serial);
     }
 
     /**
-     * 新增用户
+     * 新增${desc_function}
      *
-     * @param data
+     * @param create
      * @param loginInfo
      * @param serial
      * @return
      */
-    public boolean create(Data data, LoginInfo loginInfo, Serial serial) {
-        data.add("create_id", loginInfo.getUid());
-        return userDao.save(data);
+    public boolean create(Data create, LoginInfo loginInfo, Serial serial) {
+        create.add("create_id", loginInfo.getUid());
+        return ${code_function_low}Dao.save(create);
     }
 
     /**
-     * 修改用户
+     * 修改${desc_function}
      *
      * @param update
      * @param loginInfo
@@ -60,21 +58,21 @@ public class UserService {
      * @return
      */
     public boolean update(Data update, LoginInfo loginInfo, Serial serial) {
-        update.setPrimaryKey("id");
+        update.setPrimaryKey("${primary_key}");
         update.add("update_id", loginInfo.getUid());
-        return userDao.update(update);
+        return ${code_function_low}Dao.update(update);
     }
 
     /**
-     * 删除用户
+     * 删除${desc_function}
      *
-     * @param id
+     * @param ${primary_key}
      * @param serial
      * @return
      */
-    public int remove(String id, Serial serial) {
+    public int remove(String ${primary_key}, Serial serial) {
         Data remove = new Data();
-        remove.add("id", id, true);
+        remove.add("${primary_key}", ${primary_key}, true);
         return userDao.remove(remove);
     }
 }

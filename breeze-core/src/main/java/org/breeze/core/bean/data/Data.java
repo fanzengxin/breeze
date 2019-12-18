@@ -24,6 +24,8 @@ import java.util.*;
  * @Version: 1.0.0
  */
 public class Data extends HashMap<String, Object> {
+
+    private static Log log = LogFactory.getLog(Data.class);
     /**
      * 序列化版本标记
      */
@@ -34,7 +36,6 @@ public class Data extends HashMap<String, Object> {
     private List<String> primaryKey;
     private Map<String, String> dataType = new HashMap<String, String>();
     private Map<String, DataInfo> dataInfos = new HashMap<String, DataInfo>();
-    private Log log;
     // 增加对序列的支持
     private Map<String, String> sequence = new HashMap<String, String>();
 
@@ -45,7 +46,6 @@ public class Data extends HashMap<String, Object> {
         super();
         entityName = null;
         primaryKey = new ArrayList<String>();
-        log = LogFactory.getLog(this.getClass());
     }
 
     /**
@@ -86,7 +86,6 @@ public class Data extends HashMap<String, Object> {
                 String object = (String) set[i];
                 this.addData(object, dataMap.get(object));
             }
-            putAll(dataMap);
         }
         this.primaryKey = new ArrayList<String>();
         if (primaryKey != null) {
@@ -1077,25 +1076,52 @@ public class Data extends HashMap<String, Object> {
     /**
      * json数据转data
      *
-     * @param jsonStr
+     * @param jsonStr json字符串
+     * @param pk      主键
+     * @param field   字段
      * @return
      */
-    public static Data parseData(String jsonStr) {
+    public static Data parseData(String jsonStr, String pk, String... field) {
         try {
             JSONObject json = JSONObject.parseObject(jsonStr);
-            return parseData(json);
+            return parseData(json, pk, field);
         } catch (Exception e) {
-            return null;
+            log.logInfo("json解析失败");
+            throw new JSONException("20010");
         }
     }
 
     /**
      * json数据转data
      *
-     * @param json
+     * @param json  json数据
+     * @param pk    数据主键
+     * @param field 字段
      * @return
      */
-    public static Data parseData(JSONObject json) {
-        return new Data(json.getInnerMap());
+    public static Data parseData(JSONObject json, String pk, String... field) {
+        Data data = new Data();
+        if (field == null || field.length == 0) {
+            data = new Data(json.getInnerMap());
+        } else {
+            Map<String, Object> map = json.getInnerMap();
+            for (int i = 0; i < field.length; i++) {
+                data.add(field[i], map.get(field[i]));
+            }
+        }
+        if (UtilString.isNotEmpty(pk)) {
+            data.setPrimaryKey(pk);
+        }
+        return data;
+    }
+
+    /**
+     * 判断data是否为空
+     *
+     * @param data
+     * @return
+     */
+    public static boolean isNotEmpty(Data data) {
+        return data == null && data.size() > 0;
     }
 }

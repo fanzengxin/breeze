@@ -25,7 +25,7 @@ public @interface Api {
      *
      * @return
      */
-    String method() default "";
+    String method();
 
     /**
      * 接口描述

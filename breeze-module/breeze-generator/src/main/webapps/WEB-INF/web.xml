@@ -4,7 +4,8 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
          version="4.0">
 
-    <display-name>breeze-admin</display-name>
+
+    <display-name>breeze-generator</display-name>
     <!-- 系统初始化 -->
     <listener>
         <listener-class>org.breeze.core.listener.CoreInitListener</listener-class>

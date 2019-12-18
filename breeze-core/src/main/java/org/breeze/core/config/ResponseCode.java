@@ -21,6 +21,7 @@ public class ResponseCode {
 
     // 请求成功
     public static final int SUCCESS = 0;
+    public static final int FAILURE = 1;
     public static final int SYSTEM_ERROR = 99999;
     public static final String SUCCESS_MSG = "请求成功";
 

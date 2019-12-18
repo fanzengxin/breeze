@@ -47,4 +47,20 @@ public interface ParamFormatCheck {
      * 完整时间类型
      */
     public static final int Phone = 9;
+    /**
+     * JSON类型
+     */
+    public static final int Json = 10;
+    /**
+     * JSON数组类型
+     */
+    public static final int JsonArray = 11;
+    /**
+     * Data类型
+     */
+    public static final int Data = 12;
+    /**
+     * DataList类型
+     */
+    public static final int DataList = 13;
 }

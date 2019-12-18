@@ -128,6 +128,16 @@ public class R {
     /**
      * 返回失败结果
      *
+     * @param msg
+     * @return
+     */
+    public static R failure(String msg) {
+        return new R(ResponseCode.FAILURE, msg);
+    }
+
+    /**
+     * 返回失败结果
+     *
      * @param code
      * @param msg
      * @return

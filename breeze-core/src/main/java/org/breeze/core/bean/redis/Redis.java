@@ -617,7 +617,7 @@ public class Redis {
         if (UtilString.isNullOrEmpty(value)) {
             return null;
         } else {
-            return Data.parseData(value);
+            return Data.parseData(value, "");
         }
     }
 

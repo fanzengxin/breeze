@@ -26,4 +26,18 @@ public @interface Repository {
      * @return
      */
     String connection() default "";
+
+    /**
+     * 自动添加创建时间
+     *
+     * @return
+     */
+    boolean createTime() default true;
+
+    /**
+     * 自动添加修改时间
+     *
+     * @return
+     */
+    boolean updateTime() default true;
 }

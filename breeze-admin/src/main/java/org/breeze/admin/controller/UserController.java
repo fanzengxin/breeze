@@ -4,8 +4,11 @@ import org.breeze.admin.service.UserService;
 import org.breeze.core.annotation.common.AutoAdd;
 import org.breeze.core.annotation.controller.*;
 import org.breeze.core.bean.api.R;
+import org.breeze.core.bean.data.Data;
 import org.breeze.core.bean.data.DataList;
 import org.breeze.core.bean.log.Serial;
+import org.breeze.core.bean.login.LoginInfo;
+import org.breeze.core.constant.ParamFormatCheck;
 import org.breeze.core.constant.RequestMethod;
 import org.breeze.core.log.Log;
 import org.breeze.core.log.LogFactory;
@@ -29,37 +32,70 @@ public class UserController {
      *
      * @param page
      * @param pageSize
-     * @param param1
-     * @param param2
      * @param serial
      * @return
      */
-    @Params({
-            @Param(name = "param1", description = "必填参数1", required = true),
-            @Param(name = "param2", description = "选填参数2")
-    })
-    @Permission(value = "sys_user_page", login = false)
-    @Api(value = "page", method = RequestMethod.GET)
-    public R page(int page, int pageSize, String param1, String param2, Serial serial) {
-        DataList dataList = userService.getPage(page, pageSize, param1, param2, serial);
+    @Permission(value = "sys_user_page")
+    @Api(method = RequestMethod.GET)
+    public R page(int page, int pageSize, Serial serial) {
+        DataList dataList = userService.getPage(page, pageSize, serial);
         return R.success(dataList);
     }
 
-    @Permission(value = "sys_user_create", login = false)
-    @Api(value = "page", method = RequestMethod.GET)
-    public R create() {
-        return R.success();
+    /**
+     * 新增用户信息
+     *
+     * @param data
+     * @param serial
+     * @return
+     */
+    @Params(
+            @Param(name="data", format = ParamFormatCheck.Data, required = true)
+    )
+    @Permission(value = "sys_user_create")
+    @Api(method = RequestMethod.POST)
+    public R create(Data data, LoginInfo loginInfo, Serial serial) {
+        if (userService.create(data, loginInfo, serial)) {
+            return R.success();
+        } else {
+            return R.failure("用户保存失败");
+        }
     }
 
-    @Permission(value = "sys_user_update", login = false)
-    @Api(value = "page", method = RequestMethod.GET)
-    public R update() {
-        return R.success();
+    /**
+     * 修改用户信息
+     *
+     * @param data
+     * @param serial
+     * @return
+     */
+    @Params(
+            @Param(name="data", format = ParamFormatCheck.Data, required = true)
+    )
+    @Permission(value = "sys_user_update")
+    @Api(method = RequestMethod.PUT)
+    public R update(Data data, LoginInfo loginInfo, Serial serial) {
+        if (userService.update(data, loginInfo, serial)) {
+            return R.success();
+        } else {
+            return R.failure("用户修改失败");
+        }
     }
 
-    @Permission(value = "sys_user_delete", login = false)
-    @Api(value = "page", method = RequestMethod.DELETE)
-    public R delete() {
-        return R.success();
+    /**
+     * 删除用户信息
+     *
+     * @param id
+     * @param serial
+     * @return
+     */
+    @Params(
+            @Param(name="id", required = true)
+    )
+    @Permission(value = "sys_user_delete")
+    @Api(method = RequestMethod.DELETE)
+    public R delete(String id, Serial serial) {
+        int count = userService.remove(id, serial);
+        return R.success(count);
     }
 }

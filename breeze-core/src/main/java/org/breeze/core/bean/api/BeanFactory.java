@@ -44,6 +44,8 @@ public class BeanFactory {
     // repository 实例map
     private static Map<Class<?>, Object> repositoryMap = new HashMap<>();
 
+    private static final String API_BEAN_KEY_KEY = "_##_";
+
     /**
      * 遍历所有实例，解析注解
      */
@@ -315,7 +317,7 @@ public class BeanFactory {
                         api.method(),
                         api.descripition(),
                         paramList,
-                       null,
+                        null,
                         true,
                         true);
             } else {
@@ -332,7 +334,7 @@ public class BeanFactory {
                         permission.login(),
                         permission.sign());
             }
-            apiConfigMap.put(apiConfig.getUrl(), apiConfig);
+            apiConfigMap.put(apiConfig.getUrl() + API_BEAN_KEY_KEY + api.method(), apiConfig);
         }
     }
 
@@ -342,8 +344,8 @@ public class BeanFactory {
      * @param url
      * @return
      */
-    public static ApiConfig getApiConfig(String url) {
-        return apiConfigMap.get(url);
+    public static ApiConfig getApiConfig(String url, String method) {
+        return apiConfigMap.get(url + API_BEAN_KEY_KEY + method);
     }
 
     /**

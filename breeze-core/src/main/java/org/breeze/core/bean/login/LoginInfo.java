@@ -2,6 +2,8 @@ package org.breeze.core.bean.login;
 
 import com.alibaba.fastjson.JSONObject;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -174,6 +176,14 @@ public class LoginInfo {
         LoginInfo loginInfo = new LoginInfo();
         JSONObject json = JSONObject.parseObject(info);
         loginInfo.setUid(json.getString("uid"));
+        loginInfo.setUserId(json.getString("userId"));
+        loginInfo.setUserName(json.getString("userName"));
+        loginInfo.setGender(json.getString("gender"));
+        loginInfo.setPhoneNum(json.getString("phoneNum"));
+        loginInfo.seteMail(json.getString("eMail"));
+        loginInfo.setRole(new HashSet<>(Arrays.asList(json.getString("role").split(","))));
+        loginInfo.setDept(new HashSet<>(Arrays.asList(json.getString("dept").split(","))));
+        loginInfo.setPermissions(new HashSet<>(Arrays.asList(json.getString("permissions").split(","))));
         return loginInfo;
     }
 

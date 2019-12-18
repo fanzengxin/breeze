@@ -76,6 +76,9 @@
         <!--MySql-->
         <mysql.version>8.0.18</mysql.version>
 
+        <!--freemarker-->
+        <freemarker.version>2.3.29</freemarker.version>
+
     </properties>
 
     <!--定义jar包依赖-->
