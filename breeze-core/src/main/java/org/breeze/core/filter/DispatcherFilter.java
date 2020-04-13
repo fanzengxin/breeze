@@ -126,7 +126,7 @@ public class DispatcherFilter implements Filter {
             Map<String, Object> checkResult = checkData(apiBean, request, response, context, serial);
             if (checkResult.get("error") != null) {
                 // 请求参数验证失败
-                printString(response, R.failure((int)checkResult.get("error")));
+                printString(response, R.failure((int) checkResult.get("error")));
             } else {
                 // 根据指定参数获取对应方法，同时注入方法参数
                 List<Class<?>> classList = (List<Class<?>>) checkResult.get("class");
@@ -136,6 +136,7 @@ public class DispatcherFilter implements Filter {
                 R result = (R) runMethod.invoke(instance, ((List<Object>) checkResult.get("value")).toArray(new Object[classList.size()]));
                 // 返回执行结果
                 if (result != null) {
+                    log.logDebug("响应结果：{}", serial, result.toString());
                     printString(response, result);
                 }
             }
@@ -333,7 +334,7 @@ public class DispatcherFilter implements Filter {
             } else if (type.equals(Character.class) || type.equals(char.class)) {
                 return (T) new Character(obj.toString().charAt(0));
             } else if (type.equals(String.class)) {
-                return (T) obj;
+                return (T) String.valueOf(obj);
             } else if (type.equals(BigDecimal.class)) {
                 return (T) new BigDecimal(obj.toString());
             } else if (type.equals(LocalDateTime.class)) {
@@ -500,7 +501,7 @@ public class DispatcherFilter implements Filter {
     }
 
     /**
-     * 返回处理结果
+     * 返回处理的json结果
      *
      * @param response
      * @param result

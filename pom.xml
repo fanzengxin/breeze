@@ -8,7 +8,7 @@
     <artifactId>parent</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0</version>
-    <description>breeze框架父级目录</description>
+    <description>breeze 框架父级目录</description>
 
     <modules>
         <module>breeze-admin</module>
@@ -16,14 +16,14 @@
         <module>breeze-module</module>
     </modules>
 
-    <repositories>
-        <repository>
-            <!-- Maven 私服 -->
-            <id>nexus</id>
-            <name>Nexus Repository</name>
-            <url>http://192.168.2.100:8081/repository/maven-public/</url>
-        </repository>
-    </repositories>
+<!--    <repositories>-->
+<!--        <repository>-->
+<!--            &lt;!&ndash; Maven 私服 &ndash;&gt;-->
+<!--            <id>nexus</id>-->
+<!--            <name>Nexus Repository</name>-->
+<!--            <url>http://192.168.2.100:8081/repository/maven-public/</url>-->
+<!--        </repository>-->
+<!--    </repositories>-->
 
     <!--定义全局常量-->
     <properties>
@@ -73,11 +73,14 @@
         <!--yml文件解析-->
         <yaml.version>1.25</yaml.version>
 
-        <!--MySql-->
-        <mysql.version>8.0.18</mysql.version>
+        <!--mariadb-->
+        <mariadb.version>2.6.0</mariadb.version>
 
         <!--freemarker-->
         <freemarker.version>2.3.29</freemarker.version>
+
+        <!--jsoup-->
+        <jsoup.version>1.12.1</jsoup.version>
 
     </properties>
 
@@ -151,11 +154,11 @@
             <version>${yaml.version}</version>
         </dependency>
 
-        <!--MySql-->
+        <!-- mariadb -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.version}</version>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>${mariadb.version}</version>
         </dependency>
     </dependencies>
 

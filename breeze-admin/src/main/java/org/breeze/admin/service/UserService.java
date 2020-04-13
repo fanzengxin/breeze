@@ -1,6 +1,5 @@
 package org.breeze.admin.service;
 
-import org.breeze.admin.dao.LoginDao;
 import org.breeze.admin.dao.UserDao;
 import org.breeze.core.annotation.common.AutoAdd;
 import org.breeze.core.annotation.service.Service;
@@ -10,7 +9,6 @@ import org.breeze.core.bean.log.Serial;
 import org.breeze.core.bean.login.LoginInfo;
 import org.breeze.core.log.Log;
 import org.breeze.core.log.LogFactory;
-import org.breeze.core.utils.date.UtilDateTime;
 
 /**
  * @Description: 用户管理

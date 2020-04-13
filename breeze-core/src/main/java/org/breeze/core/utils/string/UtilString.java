@@ -1,5 +1,7 @@
 package org.breeze.core.utils.string;
 
+import java.util.Random;
+
 /**
  * @Description: 字符串相关方法
  * @Auther: 黑面阿呆
@@ -7,6 +9,8 @@ package org.breeze.core.utils.string;
  * @Version: 1.0.0
  */
 public class UtilString {
+
+    private static final String RANDOM_STR = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     /**
      * 判断字符串是否为null
@@ -316,5 +320,20 @@ public class UtilString {
             return false;
         }
         return str.indexOf(contain) > -1;
+    }
+
+    /**
+     * 生成指定位数的随机字符串
+     *
+     * @param number
+     * @return
+     */
+    public static String getRandomStr(int number) {
+        Random random = new Random();
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < number; i++) {
+            sb.append(RANDOM_STR.charAt(random.nextInt(RANDOM_STR.length())));
+        }
+        return sb.toString();
     }
 }

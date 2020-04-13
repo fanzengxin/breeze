@@ -22,7 +22,6 @@
             <artifactId>commons-lang3</artifactId>
             <version>${commons.version}</version>
         </dependency>
-
         <!--commons-collections4集合相关-->
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -35,7 +34,6 @@
             <artifactId>commons-beanutils</artifactId>
             <version>${commons-beanutils.version}</version>
         </dependency>
-
         <!--commons-codec 编解码相关-->
         <dependency>
             <groupId>commons-codec</groupId>
@@ -48,36 +46,29 @@
             <artifactId>commons-dbutils</artifactId>
             <version>${commons-dbutils.version}</version>
         </dependency>
-
         <!--IO输入/输出-->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
         </dependency>
-
         <!--文件上传-->
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
             <version>${commons-fileupload.version}</version>
         </dependency>
-
         <!--对象池-->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
             <version>${commons-pool.version}</version>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
+        <!-- jsoup爬虫相关jar -->
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.12.1</version>
+            <version>${jsoup.version}</version>
         </dependency>
-
     </dependencies>
-
-
 </project>

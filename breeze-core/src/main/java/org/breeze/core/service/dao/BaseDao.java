@@ -14,6 +14,15 @@ import org.breeze.core.constant.OperationMethod;
 public interface BaseDao {
 
     /**
+     * 根据条件查询
+     *
+     * @param find
+     * @return
+     */
+    @Select(type = OperationMethod.FIND_BY_DATA)
+    DataList find(Data find);
+
+    /**
      * 批量保存
      *
      * @param dataList

@@ -25,12 +25,24 @@ public class ResponseCode {
     public static final int SYSTEM_ERROR = 99999;
     public static final String SUCCESS_MSG = "请求成功";
 
-    public static final int LOGIN_STATUS_UNFIND = 20001; // 用户名不存在
-    public static final int LOGIN_STATUS_ERROR_PWD = 20002;// 密码错误
-    public static final int LOGIN_STATUS_DISABLED = 20003;// 用户禁用
-    public static final int LOGIN_STATUS_LOCKED = 20004; // 登录锁定
-    public static final int LOGIN_STATUS_NO_LOGIN = 20005; // 未登录
-    public static final int LOGIN_STATUS_OTHER_ERROR = 20009;// 其他登录错误
+    // 用户名不存在
+    public static final int LOGIN_STATUS_UNFIND = 20001;
+    // 密码错误
+    public static final int LOGIN_STATUS_ERROR_PWD = 20002;
+    // 用户禁用
+    public static final int LOGIN_STATUS_DISABLED = 20003;
+    // 登录锁定
+    public static final int LOGIN_STATUS_LOCKED = 20004;
+    // 未登录
+    public static final int LOGIN_STATUS_NO_LOGIN = 20005;
+    // 验证码过期
+    public static final int LOGIN_VERIFY_CODE_EXPIRE = 20006;
+    // 验证码错误
+    public static final int LOGIN_VERIFY_CODE_ERROR = 20007;
+    // 登录信息过期
+    public static final int LOGIN_STATUS_EXPIRE = 20008;
+    // 其他登录错误
+    public static final int LOGIN_STATUS_OTHER_ERROR = 20009;
 
     public static final int ERROR_API_URL = 10001;
     public static final int ERROR_API_METHOD = 10002;

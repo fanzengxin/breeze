@@ -1,9 +1,8 @@
-package org.breeze.admin.dao;
+package org.breeze.auth.dao;
 
 import org.breeze.core.annotation.repository.Repository;
 import org.breeze.core.annotation.repository.Select;
 import org.breeze.core.bean.data.Data;
-import org.breeze.core.bean.data.DataList;
 import org.breeze.core.bean.log.Serial;
 import org.breeze.core.service.dao.BaseDao;
 
@@ -16,6 +15,6 @@ import org.breeze.core.service.dao.BaseDao;
 @Repository
 public interface LoginDao extends BaseDao {
 
-    @Select(sql = "select * from breeze.sys_user where user_name=:#username")
+    @Select(sql = "select * from breeze.sys_user where user_name = #:username:#")
     Data getUserInfo(String username, Serial serial);
 }

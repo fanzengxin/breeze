@@ -4,14 +4,12 @@
 package org.breeze.core.database;
 
 
-import org.breeze.core.config.CommonConfig;
 import org.breeze.core.database.dbinterface.IDataExecute;
 import org.breeze.core.database.impl.DataExecuteMySqlImpl;
 import org.breeze.core.database.impl.DataExecutePhoenixImpl;
 import org.breeze.core.exception.DBException;
 import org.breeze.core.log.Log;
 import org.breeze.core.log.LogFactory;
-import org.breeze.core.utils.file.UtilClassLoader;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -30,7 +28,8 @@ public class DataBaseFactory {
     public static IDataExecute getDataBase(Connection conn) throws DBException {
         BaseDataExecute ide = null;
         try {
-            if (conn.getMetaData().getDriverName().toUpperCase().indexOf("MYSQL") != -1) {
+            if (conn.getMetaData().getDriverName().toUpperCase().indexOf("MYSQL") != -1 ||
+                    conn.getMetaData().getDriverName().toUpperCase().indexOf("MARIADB") != -1) {
                 ide = new DataExecuteMySqlImpl();
             } else if (conn.getMetaData().getDriverName().toUpperCase().indexOf("PHOENIX") != -1) {
                 ide = new DataExecutePhoenixImpl();

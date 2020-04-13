@@ -10,9 +10,14 @@ import org.breeze.core.utils.encry.Des3;
 public class Password {
 
     public static void main(String[] args) throws Exception {
-        String aaa = Des3.encode("sinosoft9", "breezeBase201912");
+        String aaa = Des3.encode("111111", "breezeABCDSecret");
         System.out.println(aaa);
-        aaa = Des3.decode(aaa, "breezeBase201912");
+        aaa = Des3.decode(aaa, "breezeABCDSecret");
         System.out.println(aaa);
+
+        String bbb = AES.encrypt("111111", "breeze2020Secret");
+        System.out.println(bbb);
+        bbb = AES.decrypt(bbb, "breeze2020Secret");
+        System.out.println(bbb);
     }
 }

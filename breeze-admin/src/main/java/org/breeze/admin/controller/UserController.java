@@ -19,7 +19,7 @@ import org.breeze.core.log.LogFactory;
  * @Date: 2019-12-16 17:21
  * @Version: 1.0.0
  */
-@Controller(mapper = "user")
+@Controller(mapper = "/admin/user")
 public class UserController {
 
     private static Log log = LogFactory.getLog(UserController.class);
@@ -35,9 +35,36 @@ public class UserController {
      * @param serial
      * @return
      */
-    @Permission(value = "sys_user_page")
+    @Permission(value = "sys:user:page")
     @Api(method = RequestMethod.GET)
     public R page(int page, int pageSize, Serial serial) {
+        DataList dataList = userService.getPage(page, pageSize, serial);
+        return R.success(dataList);
+    }
+
+    /**
+     * 获取当前登录用户信息
+     *
+     * @param loginInfo
+     * @param serial
+     * @return
+     */
+    @Api(value = "/info", method = RequestMethod.GET)
+    public R userInfo(LoginInfo loginInfo, Serial serial) {
+        return R.successStr(loginInfo.toString());
+    }
+
+    /**
+     * 查询用户菜单
+     *
+     * @param page
+     * @param pageSize
+     * @param serial
+     * @return
+     */
+    @Permission(value = "sys:user:menu")
+    @Api(method = RequestMethod.GET)
+    public R menu(int page, int pageSize, Serial serial) {
         DataList dataList = userService.getPage(page, pageSize, serial);
         return R.success(dataList);
     }
@@ -52,7 +79,7 @@ public class UserController {
     @Params(
             @Param(name="data", format = ParamFormatCheck.Data, required = true)
     )
-    @Permission(value = "sys_user_create")
+    @Permission(value = "sys:user:create")
     @Api(method = RequestMethod.POST)
     public R create(Data data, LoginInfo loginInfo, Serial serial) {
         if (userService.create(data, loginInfo, serial)) {
@@ -72,7 +99,7 @@ public class UserController {
     @Params(
             @Param(name="data", format = ParamFormatCheck.Data, required = true)
     )
-    @Permission(value = "sys_user_update")
+    @Permission(value = "sys:user:update")
     @Api(method = RequestMethod.PUT)
     public R update(Data data, LoginInfo loginInfo, Serial serial) {
         if (userService.update(data, loginInfo, serial)) {
@@ -92,7 +119,7 @@ public class UserController {
     @Params(
             @Param(name="id", required = true)
     )
-    @Permission(value = "sys_user_delete")
+    @Permission(value = "sys:user:delete")
     @Api(method = RequestMethod.DELETE)
     public R delete(String id, Serial serial) {
         int count = userService.remove(id, serial);

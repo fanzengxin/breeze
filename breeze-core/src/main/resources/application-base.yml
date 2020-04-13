@@ -3,14 +3,15 @@
 ######################################################################
 base:
   login:
-    alive-time: 1800 # 登录过期时间
+    alive-time: 1800 # 登录过期时间（单位：秒）
 
 
 ######################################################################
 # 系统安全
 ######################################################################
 security:
-  secretKey: 'breezeBase201912' #系统密钥
+  secretKey: 'breezeSecret2020' #系统密钥
+  secretAuthKey: 'breeze2020Secret'  #登录密码加密秘钥
 
 ######################################################################
 # 数据库
@@ -18,13 +19,13 @@ security:
 database:
   default:
     # 连接驱动
-    driverClassName: 'com.mysql.cj.jdbc.Driver'
+    driverClassName: 'org.mariadb.jdbc.Driver'
     # 连接地址
-    url: 'jdbc:mysql://192.168.2.100:3306/breeze?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true'
+    url: 'jdbc:mariadb://localhost:3306/breeze?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true'
     # 用户名
     username: 'root'
     # 密码
-    password: 'xVgm3GI2rn7qs2hW/N2UnQ=='
+    password: 'vyr2aufREVmAqWB4HyH0gQ=='
     # 初始连接数
     initialSize: 5
     # 最大连接数
@@ -56,9 +57,9 @@ database:
 ######################################################################
 redis:
   default:
-    host: 192.168.2.100
+    host: localhost
     port: 6379
-    password: 'xVgm3GI2rn7qs2hW/N2UnQ=='
+    password: 'tmduND95v3S5Csr2gLJ9xw=='
     max_active: 1024 # 可用连接实例的最大数目，默认值为8；如果赋值为-1，则表示不限制；如果pool已经分配了maxActive个jedis实例，则此时pool的状态为exhausted(耗尽)。
     max_idle: 200 # 控制一个pool最多有多少个状态为idle(空闲的)的jedis实例，默认值也是8。
     max_wait: 10000 # 等待可用连接的最大时间，单位毫秒，默认值为-1，表示永不超时。如果超过等待时间，则直接抛出JedisConnectionException；
@@ -78,4 +79,7 @@ response:
     20003: '用户名已禁用'
     20004: '用户已锁定'
     20005: '用户未登录'
+    20006: '登录验证码已过期'
+    20007: '登录验证码验证失败'
+    20008: '用户登录信息已过期'
     20009: '用户登录失败'

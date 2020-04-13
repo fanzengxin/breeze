@@ -16,7 +16,6 @@ import org.breeze.core.exception.DBException;
 import org.breeze.core.log.Log;
 import org.breeze.core.log.LogFactory;
 import org.breeze.core.utils.cache.UtilRedis;
-import org.breeze.core.utils.date.UtilDateTime;
 import org.breeze.core.utils.string.UtilSqlFormat;
 import org.breeze.core.utils.string.UtilString;
 
@@ -108,7 +107,7 @@ public class DaoInterceptor implements MethodInterceptor {
         }
         Object result = doRepository(conn, select, instance, fieldParam, classParam, repository, serial);
         if (method.getReturnType().equals(Data.class) && result instanceof DataList) {
-            DataList dl = (DataList)result;
+            DataList dl = (DataList) result;
             if (dl.size() == 0) {
                 return null;
             } else if (dl.size() == 1) {
@@ -129,7 +128,7 @@ public class DaoInterceptor implements MethodInterceptor {
      * @param instance   执行实例对象
      * @param fieldParam 按参数名Map
      * @param classParam 按参数类型Map
-     * @param repository  数据表明
+     * @param repository 数据表明
      * @param serial     日志唯一序列
      * @return
      */
@@ -153,6 +152,14 @@ public class DaoInterceptor implements MethodInterceptor {
                 case OperationMethod.FIND_PAGE_NOCOUNT:
                     // 分页不求和
                     result = findSqlPage(ide, select.sql(), fieldParam, false);
+                    break;
+                case OperationMethod.FIND_BY_DATA:
+                    List fdList = classParam.get(Data.class);
+                    if (fdList == null || fdList.size() == 0) {
+                        return false;
+                    }
+                    // 单条保存
+                    result = getByData(ide, repository, (Data) fdList.get(0));
                     break;
                 case OperationMethod.BATCH_SAVE:
                     List bsList = classParam.get(DataList.class);
@@ -244,7 +251,7 @@ public class DaoInterceptor implements MethodInterceptor {
      */
     private DataList findSql(IDataExecute ide, String sql, Map<String, Object> param) throws DBException {
         Map<String, Object> result = UtilSqlFormat.prepareSql(sql, param);
-        return ide.findSql(result.get("sql").toString(), ((List)(result.get("param"))).toArray());
+        return ide.findSql(result.get("sql").toString(), ((List) (result.get("param"))).toArray());
     }
 
     /**
@@ -264,10 +271,30 @@ public class DaoInterceptor implements MethodInterceptor {
         String execute = result.get("sql").toString();
         if (count) {
             // 统计查询总数
-            return ide.findSqlPage(execute, pageSize, page, ((List)(result.get("param"))).toArray());
+            return ide.findSqlPage(execute, pageSize, page, ((List) (result.get("param"))).toArray());
         } else {
             // 不统计查询总数
-            return ide.findSqlPage(execute, pageSize, page, SQL_FIND_NOT_COUNT, ((List)(result.get("param"))).toArray());
+            return ide.findSqlPage(execute, pageSize, page, SQL_FIND_NOT_COUNT, ((List) (result.get("param"))).toArray());
+        }
+    }
+
+    /**
+     * 保存数据
+     *
+     * @param ide
+     * @param repository
+     * @param find
+     * @return
+     * @throws DBException
+     */
+    private DataList getByData(IDataExecute ide, Repository repository, Data find) throws DBException {
+        if (find != null) {
+            if (UtilString.isNullOrEmpty(find.getEntityName())) {
+                find.setEntityName(repository.tableName());
+            }
+            return ide.find(find);
+        } else {
+            return new DataList();
         }
     }
 
@@ -281,15 +308,14 @@ public class DaoInterceptor implements MethodInterceptor {
      * @throws DBException
      */
     private int batchSave(IDataExecute ide, Repository repository, DataList batchSave) throws DBException {
-        String tableName = repository.tableName();
         if (batchSave != null && batchSave.size() > 0) {
             for (int i = 0; i < batchSave.size(); i++) {
                 Data create = batchSave.getData(i);
-                if (i == 0 && UtilString.isNotEmpty(tableName)) {
-                    create.setEntityName(tableName);
+                if (i == 0 && UtilString.isNullOrEmpty(create.getEntityName())) {
+                    create.setEntityName(repository.tableName());
                 }
                 if (repository.createTime()) {
-                    create.add("create_time", UtilDateTime.currentTimeMillis());
+                    create.add("create_time", new Date());
                 }
             }
             return ide.batchCreate(batchSave);
@@ -307,13 +333,12 @@ public class DaoInterceptor implements MethodInterceptor {
      * @throws DBException
      */
     private boolean save(IDataExecute ide, Repository repository, Data save) throws DBException {
-        String tableName = repository.tableName();
         if (save != null) {
-            if (UtilString.isNotEmpty(tableName)) {
-                save.setEntityName(tableName);
+            if (UtilString.isNullOrEmpty(save.getEntityName())) {
+                save.setEntityName(repository.tableName());
             }
             if (repository.createTime()) {
-                save.add("create_time", UtilDateTime.currentTimeMillis());
+                save.add("create_time", new Date());
             }
             Data data = ide.create(save);
             if (data != null) {
@@ -333,15 +358,14 @@ public class DaoInterceptor implements MethodInterceptor {
      * @throws DBException
      */
     private int batchUpdate(IDataExecute ide, Repository repository, DataList batchUpdate) throws DBException {
-        String tableName = repository.tableName();
         if (batchUpdate != null && batchUpdate.size() > 0) {
             for (int i = 0; i < batchUpdate.size(); i++) {
                 Data update = batchUpdate.getData(i);
-                if (i == 0 && UtilString.isNotEmpty(tableName)) {
-                    update.setEntityName(tableName);
+                if (i == 0 && UtilString.isNullOrEmpty(update.getEntityName())) {
+                    update.setEntityName(repository.tableName());
                 }
                 if (repository.updateTime()) {
-                    update.add("update_time", UtilDateTime.currentTimeMillis());
+                    update.add("update_time", new Date());
                 }
             }
             return ide.batchStore(batchUpdate);
@@ -359,13 +383,12 @@ public class DaoInterceptor implements MethodInterceptor {
      * @throws DBException
      */
     private boolean update(IDataExecute ide, Repository repository, Data update) throws DBException {
-        String tableName = repository.tableName();
         if (update != null) {
-            if (UtilString.isNotEmpty(tableName)) {
-                update.setEntityName(tableName);
+            if (UtilString.isNullOrEmpty(update.getEntityName())) {
+                update.setEntityName(repository.tableName());
             }
             if (repository.updateTime()) {
-                update.add("update_time", UtilDateTime.currentTimeMillis());
+                update.add("update_time", new Date());
             }
             Data data = ide.store(update);
             if (data != null) {
@@ -385,10 +408,9 @@ public class DaoInterceptor implements MethodInterceptor {
      * @throws DBException
      */
     private int batchRemove(IDataExecute ide, Repository repository, DataList batchRemove) throws DBException {
-        String tableName = repository.tableName();
         if (batchRemove != null && batchRemove.size() > 0) {
-            if (UtilString.isNotEmpty(tableName)) {
-                batchRemove.getData(0).setEntityName(tableName);
+            if (UtilString.isNullOrEmpty(batchRemove.getData(0).getEntityName())) {
+                batchRemove.getData(0).setEntityName(repository.tableName());
             }
             return ide.remove(batchRemove);
         }
@@ -405,9 +427,10 @@ public class DaoInterceptor implements MethodInterceptor {
      * @throws DBException
      */
     private int remove(IDataExecute ide, Repository repository, Data remove) throws DBException {
-        String tableName = repository.tableName();
         if (remove != null) {
-            remove.setEntityName(tableName);
+            if (UtilString.isNullOrEmpty(remove.getEntityName())) {
+                remove.setEntityName(repository.tableName());
+            }
             return ide.remove(remove);
         }
         return 0;

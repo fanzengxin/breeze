@@ -114,10 +114,12 @@ public class DataList extends ArrayList {
         return super.add(data);
     }
 
+    @Override
     public Object remove(int index) {
         return super.remove(index);
     }
 
+    @Override
     public boolean remove(Object o) {
         return super.remove(o);
     }
@@ -234,10 +236,10 @@ public class DataList extends ArrayList {
      */
     public String toJsonStr() {
         StringBuffer sb = new StringBuffer();
-        sb.append("{\"page\":\"").append(getNowPage()).append("\"");
-        sb.append(",\"pageSize\":\"").append(getPageSize()).append("\"");
-        sb.append(",\"pageTotal\":\"").append(getPageTotal()).append("\"");
-        sb.append(",\"dataTotal\":\"").append(getDataTotal()).append("\"");
+        sb.append("{\"page\":").append(getNowPage());
+        sb.append(",\"pageSize\":").append(getPageSize());
+        sb.append(",\"pageTotal\":").append(getPageTotal());
+        sb.append(",\"dataTotal\":").append(getDataTotal());
         sb.append(",\"dataList\":[");
         int len = size();
         for (int i = 0; i < len; i++) {
@@ -320,6 +322,7 @@ public class DataList extends ArrayList {
         return dataList == null && dataList.size() > 0;
     }
 
+    @Override
     public String toString() {
         return toJsonStr();
     }

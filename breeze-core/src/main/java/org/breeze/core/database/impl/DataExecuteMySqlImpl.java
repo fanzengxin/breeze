@@ -610,10 +610,10 @@ public class DataExecuteMySqlImpl extends BaseDataExecute {
         log.logDebug("要执行的更新SQL语句:{}", sql.toString());
         try {
             pstmt = conn.prepareStatement(sql.toString());
-//			setDataType(data);
+			setDataType(data);
             int si = 1;
             for (String k : l) {
-                setObject(pstmt, si, data.getType(k), data.get(k));
+                 setObject(pstmt, si, data.getType(k), data.get(k));
                 si++;
             }
             return pstmt;
@@ -723,6 +723,7 @@ public class DataExecuteMySqlImpl extends BaseDataExecute {
         }
     }
 
+    @Override
     protected void setDataType(Data data, ResultSet rs) throws DBException, SQLException {
         ResultSetMetaData w = rs.getMetaData();
         for (int i = 0; i < w.getColumnCount(); i++) {

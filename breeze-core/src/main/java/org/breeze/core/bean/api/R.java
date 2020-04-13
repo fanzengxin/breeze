@@ -1,10 +1,13 @@
 package org.breeze.core.bean.api;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.breeze.core.bean.data.Data;
 import org.breeze.core.bean.data.DataList;
 import org.breeze.core.config.ResponseCode;
 import org.breeze.core.utils.string.UtilString;
+
+import java.io.File;
 
 /**
  * @Description: 接口返回工具类
@@ -98,6 +101,16 @@ public class R {
     /**
      * 返回成功结果
      *
+     * @param jsonArray
+     * @return
+     */
+    public static R success(JSONArray jsonArray) {
+        return new R(ResponseCode.SUCCESS, ResponseCode.SUCCESS_MSG, jsonArray.toJSONString());
+    }
+
+    /**
+     * 返回成功结果
+     *
      * @param data
      * @return
      */
@@ -151,6 +164,7 @@ public class R {
      *
      * @return
      */
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer("{\"code\":");
         sb.append(code).append(",\"msg\":\"").append(msg).append("\"");

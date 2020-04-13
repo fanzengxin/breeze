@@ -70,4 +70,16 @@ public class LoginSession {
             return false;
         }
     }
+
+    /**
+     * 删除用户信息
+     *
+     * @param sessionId
+     * @param serial
+     * @return
+     */
+    public static String removeLoginInfo(String sessionId, Serial serial) {
+        UtilRedis.getRedis(Redis.REDIS_LOGIN_DB).del(LOGIN_INFO_REDIS_PREFIX + sessionId, serial);
+        return sessionId;
+    }
 }

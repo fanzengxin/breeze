@@ -2,7 +2,6 @@ package org.breeze.admin.dao;
 
 import org.breeze.core.annotation.repository.Repository;
 import org.breeze.core.annotation.repository.Select;
-import org.breeze.core.bean.data.Data;
 import org.breeze.core.bean.data.DataList;
 import org.breeze.core.bean.log.Serial;
 import org.breeze.core.constant.OperationMethod;

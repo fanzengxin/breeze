@@ -1018,10 +1018,12 @@ public abstract class BaseDataExecute implements IDataExecute {
      *
      * @see hx.database.execute.IDataExecute#store(hx.database.databean.Data)
      */
+    @Override
     public Data store(Data data) throws DBException {
         return store(data, false);
     }
 
+    @Override
     public Data store(Data data, boolean isCreate) throws DBException {
         PreparedStatement pstmt = null;
         int upint = 0;
@@ -1065,6 +1067,7 @@ public abstract class BaseDataExecute implements IDataExecute {
      *
      * @see hx.database.execute.IDataExecute#remove(hx.database.databean. Data)
      */
+    @Override
     public int remove(Data data) throws DBException {
         DataList dl = new DataList(0);
         dl.add(data);

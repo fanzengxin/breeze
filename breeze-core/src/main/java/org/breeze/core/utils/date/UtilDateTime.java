@@ -153,7 +153,6 @@ public class UtilDateTime {
         return df.format(new Date());
     }
 
-    // add by 刘欣宇 取给定日期的下一天,输入:2008-7-9,返回2008-7-10
     public static String getNextDay(String time) {
         int year = Integer.parseInt(time.substring(0, time.indexOf("-")));
         int month = Integer.parseInt(time.substring(time.indexOf("-") + 1, time
@@ -218,7 +217,24 @@ public class UtilDateTime {
         return df.format(d);
     }
 
-    // add by 张亮 (Felankia)
+    /**
+     * 格式化时间
+     *
+     * @param d
+     * @return
+     */
+    public static String formatTime(Date d) {
+        SimpleDateFormat df = new SimpleDateFormat(DEFAULT_FORMAT);
+        return df.format(d);
+    }
+
+    /**
+     * 格式化日期
+     *
+     * @param d
+     * @param format
+     * @return
+     */
     public static String formatDate(Date d, String format) {
         SimpleDateFormat df = new SimpleDateFormat(format);
         return df.format(d);

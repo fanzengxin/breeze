@@ -122,6 +122,18 @@ public class CommonConfig {
     }
 
     /**
+     * 获取系统加解密密钥
+     *
+     * @return
+     */
+    public static String getSecretAuthKey() {
+        if (!isInit) {
+            initConfig();
+        }
+        return BaseConfig.baseConfig.get("security.secretAuthKey");
+    }
+
+    /**
      * 获取用户session有效期
      *
      * @return
