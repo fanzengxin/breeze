@@ -67,6 +67,10 @@ public class MenuService {
         return menuDao.getMenuList(parentId, serial);
     }
 
+    public DataList getRoleMenu(String roleCode, Serial serial) {
+        return menuDao.getRoleMenu(roleCode, serial);
+    }
+
     /**
      * 根据条件查询
      *

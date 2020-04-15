@@ -25,6 +25,7 @@ public class CoreInitListener implements ServletContextListener {
      *
      * @param event
      */
+    @Override
     public void contextInitialized(ServletContextEvent event) {
         Serial serial = new Serial();
         log.logInfo("[ 系统初始化 ] 开始...", serial);

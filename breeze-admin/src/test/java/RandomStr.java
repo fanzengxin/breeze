@@ -12,11 +12,7 @@ import java.util.Random;
 public class RandomStr {
 
     public static void main(String[] args) {
-        try {
-            readFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        System.out.println(",1,2,3,".split(",", 0).length);
     }
 
     private static String getStr() {

@@ -3,9 +3,7 @@ package org.breeze.admin.controller;
 import com.alibaba.fastjson.JSONArray;
 import org.breeze.admin.service.MenuService;
 import org.breeze.core.annotation.common.AutoAdd;
-import org.breeze.core.annotation.controller.Api;
-import org.breeze.core.annotation.controller.Controller;
-import org.breeze.core.annotation.controller.Permission;
+import org.breeze.core.annotation.controller.*;
 import org.breeze.core.bean.api.R;
 import org.breeze.core.bean.data.Data;
 import org.breeze.core.bean.data.DataList;
@@ -59,19 +57,6 @@ public class MenuController {
     }
 
     /**
-     * 查询菜单信息
-     *
-     * @param serial 日志序列
-     * @return
-     */
-    @Permission("sys_menu_list")
-    @Api(value = "/{id}", method = RequestMethod.GET)
-    public R getMenu(String id, Serial serial) {
-        DataList dataList = menuService.get(id, serial);
-        return R.success(dataList);
-    }
-
-    /**
      * 新增菜单信息
      *
      * @param loginInfo 登录用户
@@ -114,6 +99,9 @@ public class MenuController {
      * @param serial 日志序列
      * @return
      */
+    @Params({
+            @Param(name = "id", description = "菜单id", required = true)
+    })
     @Permission("sys_menu_del")
     @Api(method = RequestMethod.DELETE)
     public R delete(String id, Serial serial) {
@@ -122,5 +110,22 @@ public class MenuController {
         } else {
             return R.failure("数据修改失败");
         }
+    }
+
+    /**
+     * 分页查询用户列表
+     *
+     * @param roleCode
+     * @param serial
+     * @return
+     */
+    @Params({
+            @Param(name = "roleCode", description = "角色编码", required = true)
+    })
+    @Permission
+    @Api(value = "/role", method = RequestMethod.GET)
+    public R roleMenu(String roleCode, Serial serial) {
+        DataList result = menuService.getRoleMenu(roleCode, serial);
+        return R.success(result);
     }
 }

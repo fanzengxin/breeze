@@ -39,4 +39,16 @@ public interface MenuDao extends BaseDao {
     @Select(sql = "select id, menu_name, menu_type, menu_icon, menu_permission, menu_url, menu_open_way, parent_menu_id, sort_no" +
             " from sys_menu where 1=1{ and parent_menu_id=#:parentId:#} order by sort_no")
     DataList getMenuList(Long parentId, Serial serial);
+
+    /**
+     * 查看角色菜单关联信息
+     *
+     * @param roleCode
+     * @param serial
+     * @return
+     */
+    @Select(sql = "select sm.id, sm.menu_name, sm.menu_type, sm.menu_permission, sm.parent_menu_id, srp.permission " +
+            "from sys_menu sm left join sys_role_permission srp on srp.permission=sm.menu_permission and srp.role_code=#:roleCode:# " +
+            "order by sm.sort_no")
+    DataList getRoleMenu(String roleCode, Serial serial);
 }

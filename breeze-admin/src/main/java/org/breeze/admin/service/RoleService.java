@@ -1,15 +1,17 @@
 package org.breeze.admin.service;
 
 import org.breeze.admin.dao.RoleDao;
+import org.breeze.admin.dao.RolePermissionDao;
 import org.breeze.core.annotation.common.AutoAdd;
+import org.breeze.core.annotation.service.DataBase;
 import org.breeze.core.annotation.service.Service;
 import org.breeze.core.bean.data.Data;
 import org.breeze.core.bean.data.DataList;
 import org.breeze.core.bean.log.Serial;
 import org.breeze.core.bean.login.LoginInfo;
+import org.breeze.core.utils.string.UtilString;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @description: 角色服务层
@@ -22,6 +24,9 @@ public class RoleService {
 
     @AutoAdd
     private RoleDao roleDao;
+
+    @AutoAdd
+    private RolePermissionDao rolePermissionDao;
 
     /**
      * 查询角色信息列表
@@ -92,5 +97,36 @@ public class RoleService {
         Data remove = new Data();
         remove.add("id", id, true);
         return roleDao.remove(remove);
+    }
+
+    /**
+     * 保存角色权限
+     *
+     * @param roleCode
+     * @param permissions
+     * @param serial
+     * @return
+     */
+    @DataBase(transaction = true)
+    public int savePermission(String roleCode, String permissions, Serial serial) {
+        Data find = new Data();
+        find.add("role_code", roleCode, true);
+        rolePermissionDao.remove(find);
+        Set<String> permissionSet = new HashSet<>(Arrays.asList(permissions.split(",")));
+        DataList btSave = new DataList();
+        for (String permission : permissionSet) {
+            if (UtilString.isNullOrEmpty(permission)) {
+                continue;
+            }
+            Data data = new Data();
+            data.add("role_code", roleCode);
+            data.add("permission", permission);
+            btSave.add(data);
+        }
+        if (btSave.size() > 0) {
+            return rolePermissionDao.batchSave(btSave);
+        } else {
+            return 0;
+        }
     }
 }

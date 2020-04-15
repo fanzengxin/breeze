@@ -98,4 +98,19 @@ public class RoleController {
             return R.failure("数据修改失败");
         }
     }
+
+    /**
+     * 删除角色信息
+     *
+     * @param roleCode    角色编码
+     * @param permissions 权限集合
+     * @param serial      日志序列
+     * @return
+     */
+    @Permission("sys_role_permission")
+    @Api(value = "permissions", method = RequestMethod.POST)
+    public R permissions(String roleCode, String permissions, Serial serial) {
+        int result = roleService.savePermission(roleCode, permissions, serial);
+        return R.success(result);
+    }
 }

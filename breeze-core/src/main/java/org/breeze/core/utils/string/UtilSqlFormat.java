@@ -111,36 +111,42 @@ public class UtilSqlFormat {
         String[] sqls = sql.split("\\{");
         for (int i = 0; i < sqls.length; i++) {
             String[] subSqls = sqls[i].split("\\}");
-            if (subSqls[0].startsWith("?:")) {
-                // :? 判断条件处理
-                String whereCheckStr = UtilString.subString(subSqls[0], "?:", ":?");
-                if (whereCheck(whereCheckStr, params)) {
-                    sqlStr.append(" ").append(UtilString.subString(subSqls[0], ":?"));
-                }
-            } else if (subSqls[0].indexOf("for:") != -1) {
-                // :for 判断条件处理
-                String field = UtilString.subString(subSqls[0], "for:", ":for").trim();
-                Object o = params.get(field);
-                if (o != null) {
+            if (i > 0) {
+                if (subSqls[0].indexOf(("?:")) != -1) {
+                    // :? 判断条件处理
+                    String whereCheckStr = UtilString.subString(subSqls[0], "?:", ":?");
+                    if (whereCheck(whereCheckStr, params)) {
+                        sqlStr.append(" ").append(UtilString.subString(subSqls[0], ":?"));
+                    }
+                } else if (subSqls[0].indexOf("for:") != -1) {
+                    // :for 判断条件处理
+                    String field = UtilString.subString(subSqls[0], "for:", ":for").trim();
+                    Object o = params.get(field);
+                    if (o != null) {
+                        sqlStr.append(" ").append(subSqls[0]);
+                    }
+                } else if (subSqls[0].indexOf("#:") != -1) {
+                    // 占位符条件判断
+                    String field = UtilString.subString(subSqls[0], "#:", ":#").replaceAll("%", "").trim();
+                    if (params.get(field) != null && UtilString.isNotEmpty(params.get(field).toString())) {
+                        sqlStr.append(" ").append(subSqls[0]);
+                    }
+                } else if (subSqls[0].indexOf("$:") != -1) {
+                    // 文本替换条件判断
+                    String field = UtilString.subString(subSqls[0], "$:", ":$").replaceAll("%", "").trim();
+                    if (params.get(field) != null && UtilString.isNotEmpty(params.get(field).toString())) {
+                        sqlStr.append(" ").append(subSqls[0]);
+                    }
+                } else {
                     sqlStr.append(" ").append(subSqls[0]);
                 }
-            } else if (subSqls[0].indexOf("#:") != -1) {
-                // 占位符条件判断
-                String field = UtilString.subString(subSqls[0], "#:", ":#").replaceAll("%", "").trim();
-                if (params.get(field) != null && UtilString.isNotEmpty(params.get(field).toString())) {
-                    sqlStr.append(" ").append(subSqls[0]);
-                }
-            } else if (subSqls[0].indexOf("$:") != -1) {
-                // 文本替换条件判断
-                String field = UtilString.subString(subSqls[0], "$:", ":$").replaceAll("%", "").trim();
-                if (params.get(field) != null && UtilString.isNotEmpty(params.get(field).toString())) {
-                    sqlStr.append(" ").append(subSqls[0]);
-                }
-            } else {
-                sqlStr.append(" ").append(subSqls[0]);
             }
-            if (subSqls.length > 1) {
-                sqlStr.append(" ").append(subSqls[1]);
+            if (i == 0 || subSqls.length > 1) {
+                String subSql = subSqls[0];
+                if (i > 0) {
+                    subSql = subSqls[1];
+                }
+                sqlStr.append(" ").append(subSql);
             }
         }
         return sqlStr.toString();
@@ -202,7 +208,7 @@ public class UtilSqlFormat {
                 if (subChecks.length <= 1 || subChecks[1] == null || params.get(subChecks[0]) == null) {
                     return false;
                 }
-                if (subChecks[1].startsWith("'") && subChecks[1].endsWith("'") && params.get(subChecks[0]).toString().trim()
+                if (subChecks[1].startsWith("'") && subChecks[1].endsWith("'") && params.get(subChecks[0].trim()).toString().trim()
                         .compareTo(subChecks[1].trim().substring(1, subChecks[1].trim().length() - 1)) == -1) {
                     return false;
                 } else if (new BigDecimal(params.get(subChecks[0]).toString().trim())
@@ -212,39 +218,39 @@ public class UtilSqlFormat {
             } else if (subWhere.indexOf("<=") != -1) {
                 // 小于等于的业务处理
                 String[] subChecks = subWhere.split("<=");
-                if (subChecks.length <= 1 || subChecks[1] == null || params.get(subChecks[0]) == null) {
+                if (subChecks.length <= 1 || subChecks[1] == null || params.get(subChecks[0].trim()) == null) {
                     return false;
                 }
-                if (subChecks[1].startsWith("'") && subChecks[1].endsWith("'") && params.get(subChecks[0]).toString().trim()
+                if (subChecks[1].startsWith("'") && subChecks[1].endsWith("'") && params.get(subChecks[0].trim()).toString().trim()
                         .compareTo(subChecks[1].trim().substring(1, subChecks[1].trim().length() - 1)) == 1) {
                     return false;
-                } else if (new BigDecimal(params.get(subChecks[0]).toString().trim())
+                } else if (new BigDecimal(params.get(subChecks[0].trim()).toString().trim())
                         .compareTo(new BigDecimal(subChecks[1].trim())) == 1) {
                     return false;
                 }
             } else if (subWhere.indexOf(">") != -1) {
                 // 大于的业务处理
                 String[] subChecks = subWhere.split(">");
-                if (subChecks.length <= 1 || subChecks[1] == null || params.get(subChecks[0]) == null) {
+                if (subChecks.length <= 1 || subChecks[1] == null || params.get(subChecks[0].trim()) == null) {
                     return false;
                 }
-                if (subChecks[1].startsWith("'") && subChecks[1].endsWith("'") && params.get(subChecks[0]).toString().trim()
+                if (subChecks[1].startsWith("'") && subChecks[1].endsWith("'") && params.get(subChecks[0].trim()).toString().trim()
                         .compareTo(subChecks[1].trim().substring(1, subChecks[1].trim().length() - 1)) < 1) {
                     return false;
-                } else if (subChecks.length <= 1 || subChecks[1] == null || new BigDecimal(params.get(subChecks[0]).toString().trim())
+                } else if (subChecks.length <= 1 || subChecks[1] == null || new BigDecimal(params.get(subChecks[0].trim()).toString().trim())
                         .compareTo(new BigDecimal(subChecks[1].trim())) < 1) {
                     return false;
                 }
             } else if (subWhere.indexOf("<") != -1) {
                 // 小于的业务处理
                 String[] subChecks = subWhere.split("<");
-                if (subChecks.length <= 1 || subChecks[1] == null || params.get(subChecks[0]) == null) {
+                if (subChecks.length <= 1 || subChecks[1] == null || params.get(subChecks[0].trim()) == null) {
                     return false;
                 }
-                if (subChecks[1].startsWith("'") && subChecks[1].endsWith("'") && params.get(subChecks[0]).toString().trim()
+                if (subChecks[1].startsWith("'") && subChecks[1].endsWith("'") && params.get(subChecks[0].trim()).toString().trim()
                         .compareTo(subChecks[1].trim().substring(1, subChecks[1].trim().length() - 1)) > -1) {
                     return false;
-                } else if (subChecks.length <= 1 || subChecks[1] == null || new BigDecimal(params.get(subChecks[0]).toString().trim())
+                } else if (subChecks.length <= 1 || subChecks[1] == null || new BigDecimal(params.get(subChecks[0].trim()).toString().trim())
                         .compareTo(new BigDecimal(subChecks[1].trim())) > -1) {
                     return false;
                 }
@@ -254,7 +260,7 @@ public class UtilSqlFormat {
                 if (subChecks.length <= 1 || subChecks[1] == null) {
                     return false;
                 }
-                if (!subChecks[1].trim().equals(String.valueOf(params.get(subChecks[0])).trim())) {
+                if (!subChecks[1].trim().equals(String.valueOf(params.get(subChecks[0].trim())).trim())) {
                     return false;
                 }
             } else if ("false".equalsIgnoreCase(subWhere)) {
