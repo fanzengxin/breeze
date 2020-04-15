@@ -213,6 +213,7 @@ public abstract class BaseDataExecute implements IDataExecute {
         return find(sql, pageSize, page, data, countStr, fields, orderString, countSql, false);
     }
 
+    @Override
     public DataList find(String sql, int pageSize, int page, Data data, String countStr, List<String> fields,
                          String orderString, String countSql, boolean isParam, Object... paramValue) throws DBException {
         DataList dl = new DataList();
@@ -387,6 +388,7 @@ public abstract class BaseDataExecute implements IDataExecute {
         }
         return dl;
     }
+
     /**
      * 将查询结果放入数据集对象中
      *
@@ -441,19 +443,23 @@ public abstract class BaseDataExecute implements IDataExecute {
         }
     }
 
+    @Override
     public DataList findSql(String sql, Object... paramValue) throws DBException {
         //find(String sql, int pageSize, int page,Data data, String countStr,List<String> fields,String orderString,String countSql,boolean isParam,Object... paramValue)
         return find(sql, 0, 0, null, null, null, null, null, true, paramValue);
     }
 
+    @Override
     public DataList findSql(String sql, int pageSize, int page, String countSql) throws DBException {
         return find(sql, pageSize, page, null, null, null, null, countSql);
     }
 
+    @Override
     public DataList findSql(String sql, int pageSize, int page, String countSql, Object... paramValue) throws DBException {
         return find(sql, pageSize, page, null, null, null, null, countSql, true, paramValue);
     }
 
+    @Override
     public DataList findSqlPage(String sql, int pageSize, int page, Object... paramValue) throws DBException {
         return find(sql, pageSize, page, null, null, null, null, null, true, paramValue);
     }
@@ -769,7 +775,6 @@ public abstract class BaseDataExecute implements IDataExecute {
                                                                   List<String> fields, int pageSize, int page) throws DBException;
 
 
-
     /**
      * 得到总记录数，主要是find(data)中调用
      *
@@ -955,6 +960,7 @@ public abstract class BaseDataExecute implements IDataExecute {
      *
      * @see hx.database.execute.IDataExecute#getConnection()
      */
+    @Override
     public Connection getConnection() {
         return conn;
     }

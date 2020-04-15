@@ -192,7 +192,8 @@ public class UtilSqlFormat {
             if (subWhere.indexOf("!=") != -1) {
                 // 不等于的业务处理
                 String[] subChecks = subWhere.split("!=");
-                if (subChecks.length <= 1 || subChecks[1] == null || subChecks[1].trim().equals(String.valueOf(params.get(subChecks[0])).trim())) {
+                if (subChecks.length <= 1 || subChecks[1] == null || subChecks[1].trim().equals(String.valueOf
+                        (params.get(subChecks[0].trim())).trim())) {
                     return false;
                 }
             } else if (subWhere.indexOf(">=") != -1) {

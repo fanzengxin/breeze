@@ -30,8 +30,8 @@ public class MenuService {
      * @param serial
      * @return
      */
-    public JSONArray getMenuTree(LoginInfo loginInfo, Serial serial) {
-        DataList dataList = menuDao.getMenuTree(loginInfo.getPermissions(), serial);
+    public JSONArray getMenuTree(LoginInfo loginInfo, String children, Serial serial) {
+        DataList dataList = menuDao.getMenuTree(loginInfo.getPermissions(), children, serial);
         JSONArray ja = new JSONArray();
         for (int i = 0; i < dataList.size(); i++) {
             Data d = dataList.getData(i);
@@ -40,6 +40,7 @@ public class MenuService {
             json.put("parentId", d.getLong("PARENT_MENU_ID"));
             json.put("label", d.getString("MENU_NAME"));
             json.put("path", d.getString("MENU_URL"));
+            json.put("permission", d.getString("MENU_PERMISSION"));
             if (d.getString("MENU_ICON").length() > 9) {
                 json.put("icon", d.getString("MENU_ICON").substring(9));
             } else {

@@ -13,6 +13,7 @@ import org.breeze.core.utils.string.UUIDGenerator;
 
 import java.io.*;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,12 +21,12 @@ import java.util.Map;
 
 /**
  * 数据操作MySql实现
- *
- *
  */
 public class DataExecuteMySqlImpl extends BaseDataExecute {
 
     private Log log;
+
+    private SimpleDateFormat format = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss:SSS");
 
     public DataExecuteMySqlImpl() {
         super();
@@ -153,14 +154,10 @@ public class DataExecuteMySqlImpl extends BaseDataExecute {
     /**
      * 设置PreparedStatement中的值
      *
-     * @param pstmt
-     *            PreparedStatement
-     * @param i
-     *            索引
-     * @param typeName
-     *            类型
-     * @param value
-     *            值
+     * @param pstmt    PreparedStatement
+     * @param i        索引
+     * @param typeName 类型
+     * @param value    值
      * @throws SQLException
      */
     protected void setObject(PreparedStatement pstmt, int i, String typeName, Object value) throws SQLException {
@@ -610,10 +607,10 @@ public class DataExecuteMySqlImpl extends BaseDataExecute {
         log.logDebug("要执行的更新SQL语句:{}", sql.toString());
         try {
             pstmt = conn.prepareStatement(sql.toString());
-			setDataType(data);
+            setDataType(data);
             int si = 1;
             for (String k : l) {
-                 setObject(pstmt, si, data.getType(k), data.get(k));
+                setObject(pstmt, si, data.getType(k), data.get(k));
                 si++;
             }
             return pstmt;

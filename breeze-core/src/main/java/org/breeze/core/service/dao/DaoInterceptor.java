@@ -16,6 +16,7 @@ import org.breeze.core.exception.DBException;
 import org.breeze.core.log.Log;
 import org.breeze.core.log.LogFactory;
 import org.breeze.core.utils.cache.UtilRedis;
+import org.breeze.core.utils.date.UtilDateTime;
 import org.breeze.core.utils.string.UtilSqlFormat;
 import org.breeze.core.utils.string.UtilString;
 
@@ -315,7 +316,7 @@ public class DaoInterceptor implements MethodInterceptor {
                     create.setEntityName(repository.tableName());
                 }
                 if (repository.createTime()) {
-                    create.add("create_time", new Date());
+                    create.add("create_time", UtilDateTime.currentTimeMillis());
                 }
             }
             return ide.batchCreate(batchSave);
@@ -338,7 +339,7 @@ public class DaoInterceptor implements MethodInterceptor {
                 save.setEntityName(repository.tableName());
             }
             if (repository.createTime()) {
-                save.add("create_time", new Date());
+                save.add("create_time", UtilDateTime.currentTimeMillis());
             }
             Data data = ide.create(save);
             if (data != null) {
@@ -365,7 +366,7 @@ public class DaoInterceptor implements MethodInterceptor {
                     update.setEntityName(repository.tableName());
                 }
                 if (repository.updateTime()) {
-                    update.add("update_time", new Date());
+                    update.add("update_time", UtilDateTime.currentTimeMillis());
                 }
             }
             return ide.batchStore(batchUpdate);
@@ -388,7 +389,7 @@ public class DaoInterceptor implements MethodInterceptor {
                 update.setEntityName(repository.tableName());
             }
             if (repository.updateTime()) {
-                update.add("update_time", new Date());
+                update.add("update_time", UtilDateTime.currentTimeMillis());
             }
             Data data = ide.store(update);
             if (data != null) {

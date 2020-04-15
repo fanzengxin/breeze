@@ -34,9 +34,11 @@ public class LoginController {
     /**
      * 用户登录
      *
-     * @param username 用户名
-     * @param password 密码
-     * @param serial   日志唯一序列
+     * @param username     用户名
+     * @param password     密码
+     * @param verifyCode   验证码
+     * @param verifyCodeId 验证码id
+     * @param serial       日志唯一序列
      * @return
      */
     @Params({

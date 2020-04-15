@@ -38,8 +38,8 @@ public class MenuController {
      */
     @Permission
     @Api(value = "tree", method = RequestMethod.GET)
-    public R menuTree(LoginInfo loginInfo, Serial serial) {
-        JSONArray result = menuService.getMenuTree(loginInfo, serial);
+    public R menuTree(LoginInfo loginInfo, String children, Serial serial) {
+        JSONArray result = menuService.getMenuTree(loginInfo, children, serial);
         return R.success(result);
     }
 
