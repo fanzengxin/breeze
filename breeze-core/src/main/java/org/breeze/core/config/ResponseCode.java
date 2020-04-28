@@ -44,6 +44,9 @@ public class ResponseCode {
     // 其他登录错误
     public static final int LOGIN_STATUS_OTHER_ERROR = 20009;
 
+    // 没有权限
+    public static final int REQUEST_NO_PERMISSION = 40001;
+
     public static final int ERROR_API_URL = 10001;
     public static final int ERROR_API_METHOD = 10002;
     public static final int ERROR_API_PARAM_CHECK = 10003;

@@ -3,8 +3,10 @@ package org.breeze.admin.service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.breeze.admin.dao.MenuDao;
+import org.breeze.admin.dao.RolePermissionDao;
 import org.breeze.admin.util.TreeUtils;
 import org.breeze.core.annotation.common.AutoAdd;
+import org.breeze.core.annotation.service.DataBase;
 import org.breeze.core.annotation.service.Service;
 import org.breeze.core.bean.data.Data;
 import org.breeze.core.bean.data.DataList;
@@ -22,6 +24,9 @@ public class MenuService {
 
     @AutoAdd
     private MenuDao menuDao;
+
+    @AutoAdd
+    private RolePermissionDao rolePermissionDao;
 
     /**
      * 获取当前登录用户的菜单
@@ -41,6 +46,7 @@ public class MenuService {
             json.put("label", d.getString("MENU_NAME"));
             json.put("path", d.getString("MENU_URL"));
             json.put("permission", d.getString("MENU_PERMISSION"));
+            json.put("keepAlive", d.getString("KEEP_ALIVE"));
             if (d.getString("MENU_ICON").length() > 9) {
                 json.put("icon", d.getString("MENU_ICON").substring(9));
             } else {
@@ -81,7 +87,7 @@ public class MenuService {
     public DataList get(String id, Serial serial) {
         Data find = new Data();
         find.add("id", id);
-        return menuDao.find(find);
+        return menuDao.find(find, serial);
     }
 
     /**
@@ -94,7 +100,7 @@ public class MenuService {
      */
     public boolean create(LoginInfo loginInfo, Data data, Serial serial) {
         data.add("create_id", loginInfo.getUid());
-        return menuDao.save(data);
+        return menuDao.save(data, serial);
     }
 
     /**
@@ -108,20 +114,27 @@ public class MenuService {
     public boolean update(LoginInfo loginInfo, Data data, Serial serial) {
         data.setPrimaryKey("ID");
         data.add("update_id", loginInfo.getUid());
-        return menuDao.update(data);
+        return menuDao.update(data, serial);
     }
 
     /**
-     * 更新菜单数据
+     * 删除菜单数据
      *
      * @param id
      * @param serial
      * @return
      */
+    @DataBase(transaction = true)
     public int delete(String id, Serial serial) {
         Data remove = new Data();
-        remove.setEntityName("breeze.sys_menu");
         remove.add("id", id, true);
-        return menuDao.remove(remove);
+        DataList dataList = menuDao.find(remove, serial);
+        if (dataList.size() == 1) {
+            Data rolePermissionRemove = new Data();
+            rolePermissionRemove.add("PERMISSION", dataList.getData(0).getString("MENU_PERMISSION"), true);
+            rolePermissionDao.remove(rolePermissionRemove, serial);
+            return menuDao.remove(remove, serial);
+        }
+        return 0;
     }
 }

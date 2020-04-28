@@ -13,8 +13,10 @@ import org.breeze.core.database.DataBaseFactory;
 import org.breeze.core.database.dbinterface.IDataExecute;
 import org.breeze.core.database.manager.ConnectionManager;
 import org.breeze.core.exception.DBException;
+import org.breeze.core.exception.NoSerialException;
 import org.breeze.core.log.Log;
 import org.breeze.core.log.LogFactory;
+import org.breeze.core.service.service.ServiceInterceptor;
 import org.breeze.core.utils.cache.UtilRedis;
 import org.breeze.core.utils.date.UtilDateTime;
 import org.breeze.core.utils.string.UtilSqlFormat;
@@ -24,7 +26,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: 数据库操作相关AOP
@@ -55,41 +60,40 @@ public class DaoInterceptor implements MethodInterceptor {
      * @throws Throwable
      */
     @Override
-    public Object intercept(Object object, Method method, Object[] objects, MethodProxy methodProxy) throws DBException {
+    public Object intercept(Object object, Method method, Object[] objects, MethodProxy methodProxy) throws Exception {
         // 获取query注解信息
         Select select = method.getAnnotation(Select.class);
-        // 重新整理请求参数，获取日志序列号等
-        Map<String, Object> fieldParam = new HashMap<String, Object>();
-        Map<Class<?>, List<Object>> classParam = new HashMap<Class<?>, List<Object>>();
-        Connection conn = null;
         Serial serial = null;
-        Parameter[] parameters = method.getParameters();
-        method.getReturnType();
-        for (int i = 0; i < objects.length; i++) {
-            if (objects[i] instanceof Connection) {
-                // 处理service层传过来的数据库链接
-                conn = (Connection) objects[i];
-            } else if (objects[i] instanceof Serial) {
-                // 处理service层传过来的serial
-                serial = (Serial) objects[i];
-            } else {
-                fieldParam.put(parameters[i].getName(), objects[i]);
-                List list = classParam.get(parameters[i].getType());
-                if (list == null) {
-                    list = new ArrayList();
+        if (object != null) {
+            for (int i = 0; i < objects.length; i++) {
+                if (objects[i] instanceof Serial) {
+                    serial = (Serial) objects[i];
                 }
-                list.add(objects[i]);
-                classParam.put(parameters[i].getType(), list);
             }
         }
         if (serial == null) {
-            serial = new Serial();
+            log.logError("日志序列号serial对象不能为空");
+            throw new NoSerialException("日志序列号serial对象不能为空");
+        }
+        // 重新整理请求参数，获取日志序列号等
+        Map<String, Object> fieldParam = new HashMap<String, Object>();
+        Map<Class<?>, List<Object>> classParam = new HashMap<Class<?>, List<Object>>();
+        Connection conn = ServiceInterceptor.getServiceConnection(serial);
+        Parameter[] parameters = method.getParameters();
+        for (int i = 0; i < objects.length; i++) {
+            fieldParam.put(parameters[i].getName(), objects[i]);
+            List list = classParam.get(parameters[i].getType());
+            if (list == null) {
+                list = new ArrayList();
+            }
+            list.add(objects[i]);
+            classParam.put(parameters[i].getType(), list);
         }
         // 判断是否开启缓存
-        String cache = select.cache();
-        if (UtilString.isNotEmpty(cache)) {
+        if (UtilString.isNotEmpty(select.cache())) {
             // 如果获取到缓存数据，则直接返回
-            DataList dataList = UtilRedis.getRedis(DATA_CACHE_DB).getDataList(DATA_CACHE + method.getDeclaringClass().getName() + "_" + cache, serial);
+            DataList dataList = UtilRedis.getRedis(DATA_CACHE_DB).getDataList(DATA_CACHE + method.getDeclaringClass().getName()
+                    + "_" + select.cache(), serial);
             if (dataList != null) {
                 return dataList;
             }
@@ -134,10 +138,12 @@ public class DaoInterceptor implements MethodInterceptor {
      * @return
      */
     private Object doRepository(Connection conn, Select select, Class<?> instance, Map<String, Object> fieldParam,
-                                Map<Class<?>, List<Object>> classParam, Repository repository, Serial serial) {
+                                Map<Class<?>, List<Object>> classParam, Repository repository, Serial serial) throws DBException {
+        boolean daoConn = false;
         try {
             if (conn == null) {
-                conn = ConnectionManager.getConnection();
+                conn = ConnectionManager.getConnection(repository.connection());
+                daoConn = true;
             }
             IDataExecute ide = DataBaseFactory.getDataBase(conn);
             DataList result = null;
@@ -229,16 +235,16 @@ public class DaoInterceptor implements MethodInterceptor {
             return result;
         } catch (Exception e) {
             log.logError("数据查询失败", e, serial);
+            throw new DBException(e);
         } finally {
             try {
-                if (conn != null) {
+                if (daoConn && conn != null) {
                     conn.close();
                 }
             } catch (SQLException e) {
                 log.logError("数据库链接关闭失败", e);
             }
         }
-        return null;
     }
 
     /**

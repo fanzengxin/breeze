@@ -13,7 +13,7 @@ import org.breeze.core.service.dao.BaseDao;
  * @date: 2020-04-04 20:32
  * @version: 1.0.0
  */
-@Repository(tableName = "sys_role")
+@Repository(tableName = "breeze.sys_role")
 public interface RoleDao extends BaseDao {
 
     /**

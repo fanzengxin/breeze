@@ -95,7 +95,7 @@ public class RoleController {
         if (roleService.delete(id, serial) > 0) {
             return R.success();
         } else {
-            return R.failure("数据修改失败");
+            return R.failure("数据删除失败");
         }
     }
 

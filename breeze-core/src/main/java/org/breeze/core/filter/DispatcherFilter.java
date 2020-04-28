@@ -108,7 +108,7 @@ public class DispatcherFilter implements Filter {
             if (apiBean == null) {
                 // 指定URL的实例不存在
                 log.logInfo("未配置的url地址：{}或未经许可的请求方式：{}", serial, url, request.getMethod());
-                printString(response, R.failure(ResponseCode.ERROR_API_URL));
+                printString(response, R.failure(ResponseCode.ERROR_API_URL).toString());
                 return;
             }
             // 根据实例配置获取指定的class
@@ -126,23 +126,30 @@ public class DispatcherFilter implements Filter {
             Map<String, Object> checkResult = checkData(apiBean, request, response, context, serial);
             if (checkResult.get("error") != null) {
                 // 请求参数验证失败
-                printString(response, R.failure((int) checkResult.get("error")));
+                printString(response, R.failure((int) checkResult.get("error")).toString());
             } else {
                 // 根据指定参数获取对应方法，同时注入方法参数
                 List<Class<?>> classList = (List<Class<?>>) checkResult.get("class");
                 // 获取指定请求参数的方法对象
                 Method runMethod = action.getMethod(apiBean.getMethod(), classList.toArray(new Class<?>[classList.size()]));
                 // 反射执行方法
-                R result = (R) runMethod.invoke(instance, ((List<Object>) checkResult.get("value")).toArray(new Object[classList.size()]));
+                Object o = runMethod.invoke(instance, ((List<Object>) checkResult.get("value")).toArray(new Object[classList.size()]));
                 // 返回执行结果
-                if (result != null) {
-                    log.logDebug("响应结果：{}", serial, result.toString());
-                    printString(response, result);
+                if (o == null) {
+                    log.logDebug("响应结果为空", serial);
+                } else {
+                    if (o instanceof String) {
+                        log.logDebug("响应结果：{}", serial, o.toString());
+                        printString(response, (String) o);
+                    } else if (o instanceof R) {
+                        log.logDebug("响应结果：{}", serial, o.toString());
+                        printString(response, ((R) o).toString());
+                    }
                 }
             }
         } catch (Exception e) {
             log.logInfo("系统异常", serial, e);
-            printString(response, R.failure(ResponseCode.SYSTEM_ERROR));
+            printString(response, R.failure(ResponseCode.SYSTEM_ERROR).toString());
         }
     }
 
@@ -173,6 +180,24 @@ public class DispatcherFilter implements Filter {
                 log.logInfo("用户{}账户被锁定", serial, loginInfo.getUserId());
                 // 账户锁定
                 result.put("error", ResponseCode.LOGIN_STATUS_LOCKED);
+                return result;
+            }
+        }
+        String permissionCode = apiBean.getPermissionCode();
+        // 验证权限
+        if (loginInfo != null && UtilString.isNotEmpty(permissionCode)) {
+            String[] permissions = permissionCode.split(",");
+            boolean allowPermission = false;
+            for (String pm : permissions) {
+                if (loginInfo.getPermissions().contains(pm)) {
+                    allowPermission = true;
+                    break;
+                }
+            }
+            if (!allowPermission) {
+                log.logInfo("没有请求该数据接口的权限：{}", serial, permissionCode);
+                // 账户锁定
+                result.put("error", ResponseCode.REQUEST_NO_PERMISSION);
                 return result;
             }
         }
@@ -506,7 +531,7 @@ public class DispatcherFilter implements Filter {
      * @param response
      * @param result
      */
-    private void printString(HttpServletResponse response, R result) {
+    private void printString(HttpServletResponse response, String result) {
         String encoding = CommonConfig.getEncoding();
         response.addHeader("Content-Type", "text/html;charset=" + encoding);
         response.setContentType("text/html;charset=" + encoding);
@@ -514,7 +539,7 @@ public class DispatcherFilter implements Filter {
         PrintWriter out = null;
         try {
             out = response.getWriter();
-            out.write(result.toString());
+            out.write(result);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {

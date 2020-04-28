@@ -406,9 +406,7 @@ public class DataExecutePhoenixImpl extends BaseDataExecute {
             if (countSql == null) {
                 countSql = getSearchCountSql(sql, countStr);
             }
-            if (log.isDebug()) {
-                log.logDebug("得到总页数的SQL：" + countSql);
-            }
+            log.logDebug("得到总页数的SQL：" + countSql);
             try {
                 int i = Integer.parseInt(countSql);
                 return i;

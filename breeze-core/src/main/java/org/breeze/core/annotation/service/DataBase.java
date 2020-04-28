@@ -1,5 +1,7 @@
 package org.breeze.core.annotation.service;
 
+import org.breeze.core.config.DataBaseConfig;
+
 import java.lang.annotation.*;
 
 /**
@@ -18,7 +20,7 @@ public @interface DataBase {
      *
      * @return
      */
-    String connection() default "";
+    String connection() default DataBaseConfig.DATABASE_DEFAULT_CONFIG;
 
     /**
      * 是否开启事务

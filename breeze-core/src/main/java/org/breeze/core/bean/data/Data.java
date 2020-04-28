@@ -736,6 +736,17 @@ public class Data extends HashMap<String, Object> {
      * @throws JSONException
      */
     public JSONArray getJsonArray(Object fieldName) throws JSONException {
+        return (JSONArray) get(fieldName);
+    }
+
+    /**
+     * 得到json数组
+     *
+     * @param fieldName
+     * @return
+     * @throws JSONException
+     */
+    public JSONArray getJsonArrayFromStr(Object fieldName) throws JSONException {
         String v = (String) get(fieldName);
         if (UtilString.isNullOrEmpty(v)) {
             return new JSONArray();

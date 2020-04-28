@@ -14,7 +14,7 @@ import java.util.List;
  * @date: 2020-04-05 12:00
  * @version: 1.0.0
  */
-@Repository(tableName = "sys_menu")
+@Repository(tableName = "breeze.sys_menu")
 public interface MenuDao extends BaseDao {
 
     /**
@@ -25,7 +25,7 @@ public interface MenuDao extends BaseDao {
      * @param serial
      * @return
      */
-    @Select(sql = "select id, menu_name, menu_type, menu_icon, menu_permission, menu_url, menu_open_way, parent_menu_id, sort_no" +
+    @Select(sql = "select id, menu_name, menu_type, menu_icon, menu_permission, menu_url, menu_open_way, keep_alive, parent_menu_id, sort_no" +
             " from sys_menu where {?:children != true:? menu_type < 3 and} (menu_permission in ({for:permissions:for}) or menu_permission = '') order by sort_no")
     DataList getMenuTree(List<String> permissions, String children, Serial serial);
 
@@ -36,8 +36,8 @@ public interface MenuDao extends BaseDao {
      * @param serial
      * @return
      */
-    @Select(sql = "select id, menu_name, menu_type, menu_icon, menu_permission, menu_url, menu_open_way, parent_menu_id, sort_no" +
-            " from sys_menu where 1=1{ and parent_menu_id=#:parentId:#} order by sort_no")
+    @Select(sql = "select id, menu_name, menu_type, menu_icon, menu_permission, menu_url, menu_open_way, keep_alive, parent_menu_id, sort_no" +
+            " from breeze.sys_menu where 1=1{ and parent_menu_id=#:parentId:#} order by sort_no")
     DataList getMenuList(Long parentId, Serial serial);
 
     /**
@@ -48,7 +48,7 @@ public interface MenuDao extends BaseDao {
      * @return
      */
     @Select(sql = "select sm.id, sm.menu_name, sm.menu_type, sm.menu_permission, sm.parent_menu_id, srp.permission " +
-            "from sys_menu sm left join sys_role_permission srp on srp.permission=sm.menu_permission and srp.role_code=#:roleCode:# " +
+            "from breeze.sys_menu sm left join breeze.sys_role_permission srp on srp.permission=sm.menu_permission and srp.role_code=#:roleCode:# " +
             "order by sm.sort_no")
     DataList getRoleMenu(String roleCode, Serial serial);
 }

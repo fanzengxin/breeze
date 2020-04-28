@@ -198,8 +198,15 @@ public class UtilSqlFormat {
             if (subWhere.indexOf("!=") != -1) {
                 // 不等于的业务处理
                 String[] subChecks = subWhere.split("!=");
-                if (subChecks.length <= 1 || subChecks[1] == null || subChecks[1].trim().equals(String.valueOf
-                        (params.get(subChecks[0].trim())).trim())) {
+                if (subChecks.length <= 1 || subChecks[1] == null) {
+                    return false;
+                }
+                if (subChecks[1].trim().equalsIgnoreCase("null")
+                        && params.get(subChecks[0].trim()) != null
+                        && !"".equals(params.get(subChecks[0].trim()).toString())) {
+                    return true;
+                }
+                if (subChecks[1].trim().equals(String.valueOf(params.get(subChecks[0].trim())).trim())) {
                     return false;
                 }
             } else if (subWhere.indexOf(">=") != -1) {
@@ -254,11 +261,16 @@ public class UtilSqlFormat {
                         .compareTo(new BigDecimal(subChecks[1].trim())) > -1) {
                     return false;
                 }
-            } else if (subWhere.indexOf("=") != -1) {
+            } else if (subWhere.indexOf("==") != -1) {
                 // 等于的业务处理
-                String[] subChecks = subWhere.split("=");
+                String[] subChecks = subWhere.split("==");
                 if (subChecks.length <= 1 || subChecks[1] == null) {
                     return false;
+                }
+                if (subChecks[1].trim().equalsIgnoreCase("null")
+                        && (params.get(subChecks[0].trim()) == null
+                        || "".equals(params.get(subChecks[0].trim()).toString()))) {
+                    return true;
                 }
                 if (!subChecks[1].trim().equals(String.valueOf(params.get(subChecks[0].trim())).trim())) {
                     return false;

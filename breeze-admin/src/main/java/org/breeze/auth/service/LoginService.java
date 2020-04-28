@@ -21,6 +21,7 @@ import org.breeze.core.utils.string.UtilString;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: 用户登录服务
@@ -108,7 +109,7 @@ public class LoginService {
             log.logInfo("用户不存在:{}", serial, username);
             return new LoginInfo(ResponseCode.LOGIN_STATUS_UNFIND);
         }
-        if (user.getInt("status") != 0) {
+        if (user.getInt("status") == 0) {
             log.logInfo("用户已禁用:{}", serial, username);
             return new LoginInfo(ResponseCode.LOGIN_STATUS_DISABLED);
         }
@@ -146,13 +147,13 @@ public class LoginService {
     public Data getVerifyCode(String verifyCodeId, Serial serial) {
         try {
             // 生成随机串
-            String word = UtilString.getRandomStr(4);
-            String code = UtilImage.createImageWithVerifyCode(200, 80, word);
+            Map<String, String> verifyCode = UtilString.getRandomVerifyCode();
+            String code = UtilImage.createImageWithVerifyCode(200, 80, verifyCode.get("code"));
             if (UtilString.isNullOrEmpty(verifyCodeId)) {
                 verifyCodeId = UUIDGenerator.JavaUUID();
             }
             UtilRedis.getRedis(Redis.REDIS_LOGIN_DB).setex(SYS_USER_LOGIN_VERIFY_CODE_KEY + verifyCodeId,
-                    SYS_USER_LOGIN_VERIFY_CODE_USEFUL_TIME, word, serial);
+                    SYS_USER_LOGIN_VERIFY_CODE_USEFUL_TIME, verifyCode.get("value"), serial);
             Data data = new Data();
             data.add("code", code);
             data.add("codeId", verifyCodeId);

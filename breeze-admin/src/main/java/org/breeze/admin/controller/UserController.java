@@ -35,11 +35,33 @@ public class UserController {
      * @param serial
      * @return
      */
-    @Permission(value = "sys:user:page")
-    @Api(method = RequestMethod.GET)
-    public R page(int page, int pageSize, Serial serial) {
-        DataList dataList = userService.getPage(page, pageSize, serial);
+    @Params({
+            @Param(name = "userId", description = "用户名"),
+            @Param(name = "username", description = "姓名"),
+            @Param(name = "deptId", description = "部门id"),
+            @Param(name = "childrenDept", description = "是否包含下级部门")
+    })
+    @Permission(value = "sys_user_list")
+    @Api(value = "page", method = RequestMethod.GET)
+    public R page(int page, int pageSize, String userId, String username, String deptId, String childrenDept, Serial serial) {
+        DataList dataList = userService.getPage(page, pageSize, userId, username, deptId, childrenDept, serial);
         return R.success(dataList);
+    }
+
+    /**
+     * 分页查询用户列表
+     *
+     * @param serial
+     * @return
+     */
+    @Params({
+            @Param(name = "id", description = "用户id")
+    })
+    @Permission(value = "sys_user_list")
+    @Api(value = "get", method = RequestMethod.GET)
+    public R get(String id, Serial serial) {
+        Data data = userService.getUserInfo(id, serial);
+        return R.success(data);
     }
 
     /**
@@ -55,21 +77,6 @@ public class UserController {
     }
 
     /**
-     * 查询用户菜单
-     *
-     * @param page
-     * @param pageSize
-     * @param serial
-     * @return
-     */
-    @Permission(value = "sys:user:menu")
-    @Api(method = RequestMethod.GET)
-    public R menu(int page, int pageSize, Serial serial) {
-        DataList dataList = userService.getPage(page, pageSize, serial);
-        return R.success(dataList);
-    }
-
-    /**
      * 新增用户信息
      *
      * @param data
@@ -77,9 +84,9 @@ public class UserController {
      * @return
      */
     @Params(
-            @Param(name="data", format = ParamFormatCheck.Data, required = true)
+            @Param(name = "data", format = ParamFormatCheck.Data, required = true)
     )
-    @Permission(value = "sys:user:create")
+    @Permission(value = "sys_user_add")
     @Api(method = RequestMethod.POST)
     public R create(Data data, LoginInfo loginInfo, Serial serial) {
         if (userService.create(data, loginInfo, serial)) {
@@ -97,9 +104,9 @@ public class UserController {
      * @return
      */
     @Params(
-            @Param(name="data", format = ParamFormatCheck.Data, required = true)
+            @Param(name = "data", format = ParamFormatCheck.Data, required = true)
     )
-    @Permission(value = "sys:user:update")
+    @Permission(value = "sys_user_edit")
     @Api(method = RequestMethod.PUT)
     public R update(Data data, LoginInfo loginInfo, Serial serial) {
         if (userService.update(data, loginInfo, serial)) {
@@ -117,9 +124,9 @@ public class UserController {
      * @return
      */
     @Params(
-            @Param(name="id", required = true)
+            @Param(name = "id", required = true)
     )
-    @Permission(value = "sys:user:delete")
+    @Permission(value = "sys_user_del")
     @Api(method = RequestMethod.DELETE)
     public R delete(String id, Serial serial) {
         int count = userService.remove(id, serial);

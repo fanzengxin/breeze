@@ -11,6 +11,7 @@ import org.breeze.core.utils.date.UtilDateTime;
 import org.breeze.core.utils.string.UtilString;
 
 import java.sql.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -347,6 +348,7 @@ public abstract class BaseDataExecute implements IDataExecute {
             } else {
                 dataTotal = getSearchSqlDataTotal(sql, countStr, countSql, isParam, paramValue);
                 dl.setCount(true);
+                log.logDebug("要执行的SQL参数:{}", Arrays.asList(paramValue).toString());
             }
             dl.setNowPage(page);
             dl.setPageSize(pageSize);
@@ -358,7 +360,6 @@ public abstract class BaseDataExecute implements IDataExecute {
             // 查询数据
             // 要执行的分页sql
             String exePageSql = getSearchPageSql(fieldsStr, executeSql, page, pageSize);
-            log.logDebug("分页查询：{}", executeSql);
             try {
                 pstmt = conn.prepareStatement(exePageSql);
                 // 如果有参数，则将参数设置好

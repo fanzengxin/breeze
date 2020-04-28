@@ -20,7 +20,7 @@ public class UtilImage {
     /**
      * 干扰线数量
      */
-    private static final int CODE_LINE_NUMBER = 15;
+    private static final int CODE_LINE_NUMBER = 11;
 
     /**
      * 生成图片验证码
@@ -51,16 +51,16 @@ public class UtilImage {
         for (int i = 0; i < word.length(); i++) {
             // 随机颜色
             graphics2d.setColor(new Color(20 + random.nextInt(110), 20 + random.nextInt(110), 20 + random.nextInt(110)));
-            // 旋转 -30 --- 30度
-            int jiaodu = random.nextInt(60) - 30;
+            // 旋转 -20 --- 20度
+            int jiaodu = random.nextInt(40) - 20;
             // 换算弧度
             double theta = jiaodu * Math.PI / 180;
             // 获得字母数字
             char c = word.charAt(i);
             //将c 输出到图片
-            graphics2d.rotate(theta, x, 50);
-            graphics2d.drawString(String.valueOf(c), x, 50);
-            graphics2d.rotate(-theta, x, 50);
+            graphics2d.rotate(theta, x, 55);
+            graphics2d.drawString(String.valueOf(c), x, 55);
+            graphics2d.rotate(-theta, x, 55);
             x += 40;
         }
         // 绘制干扰线

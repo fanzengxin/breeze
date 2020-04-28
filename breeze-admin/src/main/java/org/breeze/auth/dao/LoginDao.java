@@ -15,6 +15,6 @@ import org.breeze.core.service.dao.BaseDao;
 @Repository
 public interface LoginDao extends BaseDao {
 
-    @Select(sql = "select * from breeze.sys_user where user_name = #:username:#")
+    @Select(sql = "select * from breeze.sys_user where user_id = #:username:#")
     Data getUserInfo(String username, Serial serial);
 }

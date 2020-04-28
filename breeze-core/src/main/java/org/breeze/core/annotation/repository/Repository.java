@@ -1,5 +1,7 @@
 package org.breeze.core.annotation.repository;
 
+import org.breeze.core.config.DataBaseConfig;
+
 import java.lang.annotation.*;
 
 /**
@@ -25,7 +27,7 @@ public @interface Repository {
      *
      * @return
      */
-    String connection() default "";
+    String connection() default DataBaseConfig.DATABASE_DEFAULT_CONFIG;
 
     /**
      * 自动添加创建时间

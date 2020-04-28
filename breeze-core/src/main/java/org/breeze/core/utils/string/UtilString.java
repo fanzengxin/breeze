@@ -1,5 +1,7 @@
 package org.breeze.core.utils.string;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -335,5 +337,39 @@ public class UtilString {
             sb.append(RANDOM_STR.charAt(random.nextInt(RANDOM_STR.length())));
         }
         return sb.toString();
+    }
+
+    /**
+     * 生成随机数字验证码
+     *
+     * @return
+     */
+    public static Map<String, String> getRandomVerifyCode() {
+        Map<String, String> result = new HashMap<>();
+        StringBuffer code = new StringBuffer();
+        String value = null;
+        Random random = new Random();
+        int first = random.nextInt(10);
+        int type = random.nextInt(3);
+        int second = random.nextInt(10);
+        switch (type) {
+            case 0:
+                value = String.valueOf(first + second);
+                code.append(first).append("+").append(second).append("=");
+                break;
+            case 1:
+                value = String.valueOf(first - second);
+                code.append(first).append("-").append(second).append("=");
+                break;
+            case 2:
+                value = String.valueOf(first * second);
+                code.append(first).append("x").append(second).append("=");
+                break;
+            default:
+                break;
+        }
+        result.put("code", code.toString());
+        result.put("value", value);
+        return result;
     }
 }

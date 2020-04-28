@@ -69,7 +69,7 @@ public class RoleService {
      */
     public boolean create(LoginInfo loginInfo, Data data, Serial serial) {
         data.add("create_id", loginInfo.getUid());
-        return roleDao.save(data);
+        return roleDao.save(data, serial);
     }
 
     /**
@@ -83,20 +83,28 @@ public class RoleService {
     public boolean update(LoginInfo loginInfo, Data data, Serial serial) {
         data.setPrimaryKey("ID");
         data.add("update_id", loginInfo.getUid());
-        return roleDao.update(data);
+        return roleDao.update(data, serial);
     }
 
     /**
-     * 更新菜单数据
+     * 删除角色及关联数据
      *
      * @param id
      * @param serial
      * @return
      */
+    @DataBase(transaction = true)
     public int delete(String id, Serial serial) {
         Data remove = new Data();
         remove.add("id", id, true);
-        return roleDao.remove(remove);
+        DataList dataList = roleDao.find(remove, serial);
+        if (dataList.size() == 1) {
+            Data rolePermissionRemove = new Data();
+            rolePermissionRemove.add("ROLE_CODE", dataList.getData(0).getString("ROLE_CODE"), true);
+            rolePermissionDao.remove(rolePermissionRemove, serial);
+            return roleDao.remove(remove, serial);
+        }
+        return 0;
     }
 
     /**
@@ -111,7 +119,7 @@ public class RoleService {
     public int savePermission(String roleCode, String permissions, Serial serial) {
         Data find = new Data();
         find.add("role_code", roleCode, true);
-        rolePermissionDao.remove(find);
+        rolePermissionDao.remove(find, serial);
         Set<String> permissionSet = new HashSet<>(Arrays.asList(permissions.split(",")));
         DataList btSave = new DataList();
         for (String permission : permissionSet) {
@@ -124,7 +132,7 @@ public class RoleService {
             btSave.add(data);
         }
         if (btSave.size() > 0) {
-            return rolePermissionDao.batchSave(btSave);
+            return rolePermissionDao.batchSave(btSave, serial);
         } else {
             return 0;
         }

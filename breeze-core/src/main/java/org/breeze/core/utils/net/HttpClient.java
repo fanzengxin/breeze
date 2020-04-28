@@ -19,6 +19,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.util.Map;
 
 /**
  * @Description:
@@ -127,7 +128,7 @@ public class HttpClient {
      * @return
      * @throws Exception
      */
-    public String sendPost(String url, String postString, String certLocalPath, String password) throws Exception {
+    public String sendPost(String url, String postString, String certLocalPath, String password, Map<String, String> header) throws Exception {
         if (!hasInit) {
             init(certLocalPath, password);
         }
@@ -135,8 +136,13 @@ public class HttpClient {
         HttpPost httpPost = new HttpPost(url);
         // 得指明使用UTF-8编码，否则到API服务器XML的中文不能被成功识别
         StringEntity postEntity = new StringEntity(postString, "UTF-8");
-        httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-        httpPost.addHeader("Cookie", "PHPSESSID=7077af9f68d36dd78b1da3dbdb35903f; admin_id=wangyy; admin_pass=MTIzNDU2; remembercookie=1");
+        //httpPost.addHeader("Content-Type", "application/json; charset=utf-8");
+        //httpPost.addHeader("Cookie", "PHPSESSID=7077af9f68d36dd78b1da3dbdb35903f; admin_id=wangyy; admin_pass=MTIzNDU2; remembercookie=1");
+        if (header != null && header.size() > 0) {
+            for (Map.Entry<String, String> entry : header.entrySet()) {
+                httpPost.addHeader(entry.getKey(), entry.getValue());
+            }
+        }
         httpPost.setEntity(postEntity);
         // 设置请求器的配置
         httpPost.setConfig(requestConfig);

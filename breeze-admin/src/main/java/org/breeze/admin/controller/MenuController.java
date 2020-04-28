@@ -34,7 +34,6 @@ public class MenuController {
      * @param serial
      * @return
      */
-    @Permission
     @Api(value = "tree", method = RequestMethod.GET)
     public R menuTree(LoginInfo loginInfo, String children, Serial serial) {
         JSONArray result = menuService.getMenuTree(loginInfo, children, serial);
@@ -122,7 +121,7 @@ public class MenuController {
     @Params({
             @Param(name = "roleCode", description = "角色编码", required = true)
     })
-    @Permission
+    @Permission("sys_role_permission")
     @Api(value = "/role", method = RequestMethod.GET)
     public R roleMenu(String roleCode, Serial serial) {
         DataList result = menuService.getRoleMenu(roleCode, serial);

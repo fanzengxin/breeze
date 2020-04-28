@@ -3,6 +3,7 @@ package org.breeze.core.service.dao;
 import org.breeze.core.annotation.repository.Select;
 import org.breeze.core.bean.data.Data;
 import org.breeze.core.bean.data.DataList;
+import org.breeze.core.bean.log.Serial;
 import org.breeze.core.constant.OperationMethod;
 
 /**
@@ -20,7 +21,7 @@ public interface BaseDao {
      * @return
      */
     @Select(type = OperationMethod.FIND_BY_DATA)
-    DataList find(Data find);
+    DataList find(Data find, Serial serial);
 
     /**
      * 批量保存
@@ -29,7 +30,7 @@ public interface BaseDao {
      * @return
      */
     @Select(type = OperationMethod.BATCH_SAVE)
-    int batchSave(DataList dataList);
+    int batchSave(DataList dataList, Serial serial);
 
     /**
      * 单条保存
@@ -38,7 +39,7 @@ public interface BaseDao {
      * @return
      */
     @Select(type = OperationMethod.SAVE)
-    boolean save(Data data);
+    boolean save(Data data, Serial serial);
 
     /**
      * 批量修改
@@ -47,7 +48,7 @@ public interface BaseDao {
      * @return
      */
     @Select(type = OperationMethod.BATCH_UPDATE)
-    int batchUpdate(DataList dataList);
+    int batchUpdate(DataList dataList, Serial serial);
 
     /**
      * 单条修改
@@ -56,7 +57,7 @@ public interface BaseDao {
      * @return
      */
     @Select(type = OperationMethod.UPDATE)
-    boolean update(Data data);
+    boolean update(Data data, Serial serial);
 
     /**
      * 批量删除
@@ -65,7 +66,7 @@ public interface BaseDao {
      * @return
      */
     @Select(type = OperationMethod.BATCH_REMOVE)
-    int batchRemve(DataList dataList);
+    int batchRemve(DataList dataList, Serial serial);
 
     /**
      * 单条删除
@@ -74,5 +75,5 @@ public interface BaseDao {
      * @return
      */
     @Select(type = OperationMethod.REMOVE)
-    int remove(Data data);
+    int remove(Data data, Serial serial);
 }

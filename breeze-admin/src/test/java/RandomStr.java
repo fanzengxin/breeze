@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -12,6 +14,7 @@ import java.util.Random;
 public class RandomStr {
 
     public static void main(String[] args) {
+        Map map = new HashMap<>();
         System.out.println(",1,2,3,".split(",", 0).length);
     }
 

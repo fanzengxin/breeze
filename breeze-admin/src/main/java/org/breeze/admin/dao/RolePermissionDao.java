@@ -9,6 +9,6 @@ import org.breeze.core.service.dao.BaseDao;
  * @date: 2020-04-15 18:26
  * @version: 1.0.0
  */
-@Repository(tableName = "sys_role_permission", createTime = false)
+@Repository(tableName = "breeze.sys_role_permission", createTime = false)
 public interface RolePermissionDao extends BaseDao {
 }

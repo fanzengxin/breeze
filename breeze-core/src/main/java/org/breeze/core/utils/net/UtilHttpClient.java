@@ -18,6 +18,7 @@ import org.breeze.core.log.LogFactory;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,9 +41,21 @@ public class UtilHttpClient {
      * @throws Exception
      */
     public static String post(String url, String postStr) throws Exception {
+        return post(url, postStr, new HashMap<>());
+    }
+
+    /**
+     * post提交
+     *
+     * @param url
+     * @param postStr post提交的字符串
+     * @return
+     * @throws Exception
+     */
+    public static String post(String url, String postStr, Map<String, String> header) throws Exception {
         HttpClient hc = new HttpClient();
         try {
-            return hc.sendPost(url, postStr, null, null);
+            return hc.sendPost(url, postStr, null, null, header);
         } catch (Exception e) {
             throw e;
         } finally {
@@ -118,10 +131,27 @@ public class UtilHttpClient {
      * @throws IOException
      */
     public static String post(String url, Map<String, String> params) throws IOException {
+        return post(url, params, null);
+    }
+
+        /**
+         * HttpClient的post方法
+         *
+         * @param url
+         * @param params 参数map集合
+         * @return
+         * @throws IOException
+         */
+    public static String post(String url, Map<String, String> params, Map<String, String> header) throws IOException {
         // 创建默认的httpClient实例.
         CloseableHttpClient httpclient = HttpClients.createDefault();
         // 创建httppost
         HttpPost httppost = new HttpPost(url);
+        if (header != null && header.size() > 0) {
+            for (Map.Entry<String, String> entry : header.entrySet()) {
+                httppost.addHeader(entry.getKey(), entry.getValue());
+            }
+        }
         // 创建参数队列
         List<NameValuePair> formParams = new ArrayList<NameValuePair>();
         if (params != null) {

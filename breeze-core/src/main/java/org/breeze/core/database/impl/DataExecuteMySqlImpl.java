@@ -468,7 +468,7 @@ public class DataExecuteMySqlImpl extends BaseDataExecute {
         int start = (page - 1) * pageSize;
         StringBuffer pageSql = new StringBuffer(sql);
         pageSql.append(" LIMIT ").append(start).append(",").append(pageSize);
-        log.logDebug("要执行的分页SQL语句:{}", pageSql);
+        log.logDebug("要执行的分页SQL:{}", pageSql);
         return pageSql.toString();
     }
 
