@@ -19,7 +19,7 @@ import org.breeze.core.log.LogFactory;
  * @Date: 2019-12-17 14:42
  * @Version: 1.0.0
  */
-@Controller(mapper = "/admin/menu")
+@Controller(mapper = "/menu")
 public class MenuController {
 
     private static Log log = LogFactory.getLog(MenuController.class);

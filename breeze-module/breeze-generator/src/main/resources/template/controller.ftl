@@ -49,11 +49,11 @@ public class ${code_function}Controller {
      * @return
      */
     @Params(
-            @Param(name="create", format = ParamFormatCheck.Data, required = true)
+            @Param(name="data", format = ParamFormatCheck.Data, required = true)
     )
     @Permission(value = "${code_permission}_create")
     @Api(method = RequestMethod.POST)
-    public R create(Data create, LoginInfo loginInfo, Serial serial) {
+    public R create(Data data, LoginInfo loginInfo, Serial serial) {
         if (${code_function_low}Service.create(create, loginInfo, serial)) {
             return R.success();
         } else {

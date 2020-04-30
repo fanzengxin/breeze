@@ -20,7 +20,7 @@ import org.breeze.core.log.LogFactory;
  * @date: 2020-04-12 10:47
  * @version: 1.0.0
  */
-@Controller(mapper = "/admin/role")
+@Controller(mapper = "/role")
 public class RoleController {
 
     private static Log log = LogFactory.getLog(RoleController.class);

@@ -19,7 +19,7 @@ import org.breeze.core.log.LogFactory;
  * @Date: 2019-12-16 17:21
  * @Version: 1.0.0
  */
-@Controller(mapper = "/admin/user")
+@Controller(mapper = "/user")
 public class UserController {
 
     private static Log log = LogFactory.getLog(UserController.class);
@@ -84,7 +84,7 @@ public class UserController {
      * @return
      */
     @Params(
-            @Param(name = "data", format = ParamFormatCheck.Data, required = true)
+            @Param(name = "data", description = "新增人员信息", format = ParamFormatCheck.Data, required = true)
     )
     @Permission(value = "sys_user_add")
     @Api(method = RequestMethod.POST)
@@ -104,7 +104,7 @@ public class UserController {
      * @return
      */
     @Params(
-            @Param(name = "data", format = ParamFormatCheck.Data, required = true)
+            @Param(name = "data", description = "修改人员信息", format = ParamFormatCheck.Data, required = true)
     )
     @Permission(value = "sys_user_edit")
     @Api(method = RequestMethod.PUT)
@@ -124,7 +124,7 @@ public class UserController {
      * @return
      */
     @Params(
-            @Param(name = "id", required = true)
+            @Param(name = "id", description = "要删除的人员ID", required = true)
     )
     @Permission(value = "sys_user_del")
     @Api(method = RequestMethod.DELETE)

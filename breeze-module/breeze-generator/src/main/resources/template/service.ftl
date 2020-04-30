@@ -46,7 +46,7 @@ public class ${code_function}Service {
      */
     public boolean create(Data create, LoginInfo loginInfo, Serial serial) {
         create.add("create_id", loginInfo.getUid());
-        return ${code_function_low}Dao.save(create);
+        return ${code_function_low}Dao.save(create, serial);
     }
 
     /**
@@ -60,7 +60,7 @@ public class ${code_function}Service {
     public boolean update(Data update, LoginInfo loginInfo, Serial serial) {
         update.setPrimaryKey("${primary_key}");
         update.add("update_id", loginInfo.getUid());
-        return ${code_function_low}Dao.update(update);
+        return ${code_function_low}Dao.update(update, serial);
     }
 
     /**
@@ -73,6 +73,6 @@ public class ${code_function}Service {
     public int remove(String ${primary_key}, Serial serial) {
         Data remove = new Data();
         remove.add("${primary_key}", ${primary_key}, true);
-        return userDao.remove(remove);
+        return ${code_function_low}Dao.remove(remove, serial);
     }
 }

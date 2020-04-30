@@ -2,7 +2,6 @@ package org.breeze.admin.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import org.breeze.admin.service.DeptService;
-import org.breeze.admin.service.MenuService;
 import org.breeze.core.annotation.common.AutoAdd;
 import org.breeze.core.annotation.controller.*;
 import org.breeze.core.bean.api.R;
@@ -21,7 +20,7 @@ import org.breeze.core.log.LogFactory;
  * @date: 2020-04-18 12:04
  * @version: 1.0.0
  */
-@Controller(mapper = "/admin/dept")
+@Controller(mapper = "/dept")
 public class DeptController {
 
     private static Log log = LogFactory.getLog(DeptController.class);
@@ -32,7 +31,7 @@ public class DeptController {
     /**
      * 查看部门树
      *
-     * @param serial    日志序列
+     * @param serial 日志序列
      * @return
      */
     @Permission("sys_dept_tree")
@@ -45,7 +44,7 @@ public class DeptController {
     /**
      * 查看部门树
      *
-     * @param serial    日志序列
+     * @param serial 日志序列
      * @return
      */
     @Params({
