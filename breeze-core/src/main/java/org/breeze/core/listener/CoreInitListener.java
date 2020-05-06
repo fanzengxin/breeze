@@ -9,6 +9,7 @@ import org.breeze.core.log.LogFactory;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 
 /**
  * @Description: 系统初始化监听
@@ -16,6 +17,7 @@ import javax.servlet.ServletContextListener;
  * @Date: 2019/8/7 11:18
  * @Version: 1.0.0
  */
+@WebListener("CoreInitListener")
 public class CoreInitListener implements ServletContextListener {
 
     private static Log log = LogFactory.getLog(CoreInitListener.class);

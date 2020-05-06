@@ -180,6 +180,7 @@ public class UserService {
 
         // 更新用户信息
         update.setPrimaryKey("id");
+        update.remove("PASSWORD");
         update.add("update_id", loginInfo.getUid());
         return userDao.update(update, serial);
     }

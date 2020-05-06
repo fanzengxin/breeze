@@ -25,6 +25,8 @@ import org.breeze.core.utils.date.UtilDateTime;
 import org.breeze.core.utils.string.UtilString;
 
 import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
+import javax.servlet.annotation.WebInitParam;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -42,6 +44,7 @@ import java.util.regex.Pattern;
  * @Date: 2019/7/31 9:40
  * @Version: 1.0.0
  */
+@WebFilter(filterName = "ServiceController", value = "/service/*", description = "服务控制器")
 public class DispatcherFilter implements Filter {
 
     private static Log log = LogFactory.getLog(DispatcherFilter.class);

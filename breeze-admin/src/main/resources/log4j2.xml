@@ -8,7 +8,8 @@
     <appenders>
         <!--控制台日志-->
         <console name="console" target="SYSTEM_OUT">
-            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}][%-5level][%thread][%logger]%msg%n"/>
+<!--            <PatternLayout pattern="[%d{YYYY-MM-dd HH:mm:ss.SSS}][%-1level][%thread][%logger]%msg%n"/>-->
+            <PatternLayout pattern="[%d{HH:mm:ss.SSS}]%msg%n"/>
         </console>
     </appenders>
     <loggers>

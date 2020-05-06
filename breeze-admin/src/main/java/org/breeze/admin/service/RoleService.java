@@ -73,7 +73,7 @@ public class RoleService {
     }
 
     /**
-     * 更新菜单数据
+     * 更新角色数据
      *
      * @param loginInfo
      * @param data

@@ -6,6 +6,7 @@ import org.breeze.core.annotation.common.AutoAdd;
 import org.breeze.core.annotation.controller.*;
 import org.breeze.core.annotation.repository.Repository;
 import org.breeze.core.annotation.service.Service;
+import org.breeze.core.bean.log.Serial;
 import org.breeze.core.log.Log;
 import org.breeze.core.log.LogFactory;
 import org.breeze.core.service.dao.DaoInterceptor;
@@ -334,6 +335,7 @@ public class BeanFactory {
                         permission.login(),
                         permission.sign());
             }
+            log.logInfo("加载请求地址:{}，请求方法:{}", new Serial(), apiConfig.getUrl(), api.method());
             apiConfigMap.put(apiConfig.getUrl() + API_BEAN_KEY_KEY + api.method(), apiConfig);
         }
     }

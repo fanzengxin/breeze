@@ -4,6 +4,8 @@ import org.breeze.core.config.CommonConfig;
 import org.breeze.core.utils.string.UtilString;
 
 import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
+import javax.servlet.annotation.WebInitParam;
 import java.io.IOException;
 
 /**
@@ -12,6 +14,10 @@ import java.io.IOException;
  * @Date: 2019/8/6 11:40
  * @Version: 1.0.0
  */
+@WebFilter(filterName = "CharacterEncodingFilter", value = "/*", description = "字符编码过滤器",
+        initParams = {
+                @WebInitParam(name = "encoding", value = "UTF-8")
+        })
 public class CharacterEncodingFilter implements Filter {
 
     /**
