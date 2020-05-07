@@ -11,7 +11,7 @@
  Target Server Version : 100412
  File Encoding         : 65001
 
- Date: 06/05/2020 17:38:23
+ Date: 07/05/2020 17:50:38
 */
 
 SET NAMES utf8mb4;
@@ -53,6 +53,7 @@ CREATE TABLE `sys_dict`  (
   `dict_value` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '字典值',
   `dict_desc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '字典项描述',
   `dict_type` tinyint(1) NULL DEFAULT NULL COMMENT '字典类型，0=字典项，1=字典值',
+  `value_type` tinyint(1) NULL DEFAULT NULL COMMENT '数据类型，0=数字，1=文本',
   `dict_parent` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '父级id',
   `sort` int(10) NULL DEFAULT NULL COMMENT '排序字段',
   `remarks` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '备注',
@@ -61,15 +62,18 @@ CREATE TABLE `sys_dict`  (
   `update_id` int(10) NULL DEFAULT NULL COMMENT '修改者id',
   `update_time` bigint(13) NULL DEFAULT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '数据字典' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '数据字典' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_dict
 -- ----------------------------
-INSERT INTO `sys_dict` VALUES (1, 'SYS_GENDER', NULL, '性别描述', 0, '0', 10, NULL, 1, 1588746336996, 1, 1588755538445);
-INSERT INTO `sys_dict` VALUES (5, '0', '1', '男', 1, 'SYS_GENDER', 10, '男性', 1, 1588754380534, 1, 1588755550310);
-INSERT INTO `sys_dict` VALUES (6, '0', '2', '女', 1, 'SYS_GENDER', 20, '女性', 1, 1588755143935, NULL, NULL);
-INSERT INTO `sys_dict` VALUES (9, '0', '0', '保密', 1, 'SYS_GENDER', 30, '保密', 1, 1588755309106, NULL, NULL);
+INSERT INTO `sys_dict` VALUES (1, 'SYS_GENDER', NULL, '性别描述', 0, 0, '0', 10, NULL, 1, 1588746336996, 1, 1588832984060);
+INSERT INTO `sys_dict` VALUES (5, '0', '1', '男', 1, 0, 'SYS_GENDER', 10, '男性', 1, 1588754380534, 1, 1588833104251);
+INSERT INTO `sys_dict` VALUES (6, '0', '2', '女', 1, 0, 'SYS_GENDER', 20, '女性', 1, 1588755143935, 1, 1588833106800);
+INSERT INTO `sys_dict` VALUES (9, '0', '0', '保密', 1, 0, 'SYS_GENDER', 30, '保密', 1, 1588755309106, 1, 1588833108901);
+INSERT INTO `sys_dict` VALUES (13, 'SYS_USER_STATUS', NULL, '用户状态', 0, 0, '0', 20, NULL, 1, 1588831145520, NULL, NULL);
+INSERT INTO `sys_dict` VALUES (14, '0', '1', '启用', 1, 0, 'SYS_USER_STATUS', 20, '用户启用', 1, 1588831165234, 1, 1588833251349);
+INSERT INTO `sys_dict` VALUES (15, '0', '0', '禁用', 1, 0, 'SYS_USER_STATUS', 10, '用户禁用', 1, 1588831178728, 1, 1588833249159);
 
 -- ----------------------------
 -- Table structure for sys_menu
@@ -91,7 +95,7 @@ CREATE TABLE `sys_menu`  (
   `update_id` int(11) NULL DEFAULT NULL COMMENT '修改者',
   `update_time` bigint(13) NULL DEFAULT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '系统菜单表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 27 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '系统菜单表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_menu
@@ -211,7 +215,7 @@ CREATE TABLE `sys_user`  (
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (1, 'admin', '系统管理员', 'f01d5a5774ef6f5ec58ad08bdfe52aca', '1234567890', 1, '18512345678', '342652190@qq.com', NULL, NULL, 1, 0, NULL, NULL, 1588055460068, 1, 1588749365242, 1588055460068);
+INSERT INTO `sys_user` VALUES (1, 'admin', '系统管理员', 'f01d5a5774ef6f5ec58ad08bdfe52aca', '1234567890', 1, '18512345678', '342652190@qq.com', NULL, NULL, 1, 0, NULL, NULL, 1588055460068, 1, 1588841234005, 1588055460068);
 
 -- ----------------------------
 -- Table structure for sys_user_dept

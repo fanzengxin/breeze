@@ -11,6 +11,7 @@ import org.breeze.core.bean.login.LoginInfo;
 import org.breeze.core.constant.RequestMethod;
 import org.breeze.core.log.Log;
 import org.breeze.core.log.LogFactory;
+import org.breeze.core.utils.cache.UtilRedis;
 
 /**
  * @description: 数据字典
@@ -51,6 +52,34 @@ public class DictController {
      * @param serial
      * @return
      */
+    @Api(value = "/all", method = RequestMethod.GET)
+    public R getAllDicts(String dictCode, Serial serial) {
+        Data dicts = dictService.getAllDict(serial);
+        return R.success(dicts);
+    }
+
+    /**
+     * 获取数据字典最近更新时间
+     *
+     * @param serial
+     * @return
+     */
+    @Api(value = "/check", method = RequestMethod.GET)
+    public R checkUpdate(Serial serial) {
+        String times = dictService.getLastUpdateTime(serial);
+        return R.success(times);
+    }
+
+    /**
+     * 分页查询字典项列表
+     *
+     * @param dictCode
+     * @param serial
+     * @return
+     */
+    @Params({
+            @Param(name = "dictCode", description = "字典项", required = true)
+    })
     @Permission("sys_dict_list")
     @Api(method = RequestMethod.GET)
     public R getDicts(String dictCode, Serial serial) {

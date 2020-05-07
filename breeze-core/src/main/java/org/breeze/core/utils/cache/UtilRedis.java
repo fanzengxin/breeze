@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Description: redis 缓存工具类
@@ -20,8 +21,7 @@ public class UtilRedis {
 
     private static final String DEFAULT_REDIS = "default";
     private static final int DEFAULT_DB = 0;
-    private static Map<String, Redis> redisMap = new HashMap<String, Redis>();
-    private static Redis defaultRedis = new Redis(DEFAULT_REDIS, DEFAULT_DB);
+    private static Map<String, Redis> redisMap = new ConcurrentHashMap<>();
 
     /**
      * 获取redis对象
@@ -29,7 +29,7 @@ public class UtilRedis {
      * @return
      */
     public static Redis getRedis() {
-        return defaultRedis;
+        return getRedis(DEFAULT_REDIS, DEFAULT_DB);
     }
 
     /**
@@ -39,12 +39,7 @@ public class UtilRedis {
      * @return
      */
     public static Redis getRedis(String name) {
-        Redis redis = redisMap.get(name + "___" + DEFAULT_REDIS);
-        if (redis == null) {
-            redis = new Redis(name, DEFAULT_DB);
-            redisMap.put(name + "___" + DEFAULT_REDIS, redis);
-        }
-        return redis;
+        return getRedis(name, DEFAULT_DB);
     }
 
     /**
@@ -54,12 +49,7 @@ public class UtilRedis {
      * @return
      */
     public static Redis getRedis(int db) {
-        Redis redis = redisMap.get(DEFAULT_REDIS + "___" + db);
-        if (redis == null) {
-            redis = new Redis(DEFAULT_REDIS, db);
-            redisMap.put(DEFAULT_REDIS + "___" + db, redis);
-        }
-        return redis;
+        return getRedis(DEFAULT_REDIS, db);
     }
 
     /**
@@ -72,8 +62,13 @@ public class UtilRedis {
     public static Redis getRedis(String name, int db) {
         Redis redis = redisMap.get(name + "___" + db);
         if (redis == null) {
-            redis = new Redis(name, db);
-            redisMap.put(name + "___" + db, redis);
+            synchronized (UtilRedis.class) {
+                redis = redisMap.get(name + "___" + db);
+                if (redis == null) {
+                    redis = new Redis(name, db);
+                    redisMap.put(name + "___" + db, redis);
+                }
+            }
         }
         return redis;
     }
@@ -86,7 +81,7 @@ public class UtilRedis {
      * @param serial
      */
     public static void set(String key, String value, Serial serial) {
-        defaultRedis.set(key, value, serial);
+        getRedis().set(key, value, serial);
     }
 
     /**
@@ -97,7 +92,7 @@ public class UtilRedis {
      * @param serial
      */
     public static void rpush(String key, String value, Serial serial) {
-        defaultRedis.rpush(key, value, serial);
+        getRedis().rpush(key, value, serial);
     }
 
     /**
@@ -108,7 +103,7 @@ public class UtilRedis {
      * @param serial
      */
     public static void setList(String key, String value, Serial serial) {
-        defaultRedis.setList(key, value, serial);
+        getRedis().setList(key, value, serial);
     }
 
     /**
@@ -119,7 +114,7 @@ public class UtilRedis {
      * @return
      */
     public static List<String> getList(String key, Serial serial) {
-        return defaultRedis.getList(key, serial);
+        return getRedis().getList(key, serial);
     }
 
     /**
@@ -129,7 +124,7 @@ public class UtilRedis {
      * @param serial
      */
     public static String getListRpop(String key, Serial serial) {
-        return defaultRedis.getListRpop(key, serial);
+        return getRedis().getListRpop(key, serial);
     }
 
     /**
@@ -141,7 +136,7 @@ public class UtilRedis {
      * @param serial
      */
     public static void setex(String key, int seconds, String value, Serial serial) {
-        defaultRedis.setex(key, seconds, value, serial);
+        getRedis().setex(key, seconds, value, serial);
     }
 
     /**
@@ -152,7 +147,7 @@ public class UtilRedis {
      * @return -3 系统错误，-2 不存在，-1 没有设置，大于0的时间是有效期
      */
     public static long ttl(String key, Serial serial) {
-        return defaultRedis.ttl(key, serial);
+        return getRedis().ttl(key, serial);
     }
 
     /**
@@ -163,18 +158,7 @@ public class UtilRedis {
      * @param value
      */
     public static void hdel(String key, Serial serial, String... value) {
-        defaultRedis.hdel(key, serial, value);
-    }
-
-    /**
-     * 设置多键值对
-     *
-     * @param key
-     * @param value
-     * @param serial
-     */
-    public static void mset(String key, Map<String, String> value, Serial serial) {
-        defaultRedis.mset(key, value, serial);
+        getRedis().hdel(key, serial, value);
     }
 
     /**
@@ -185,7 +169,7 @@ public class UtilRedis {
      * @param serial
      */
     public static void hmset(String key, Map<String, String> value, Serial serial) {
-        defaultRedis.hmset(key, value, serial);
+        getRedis().hmset(key, value, serial);
     }
 
     /**
@@ -196,7 +180,7 @@ public class UtilRedis {
      * @return
      */
     public static Set<String> hkeys(String key, Serial serial) {
-        return defaultRedis.hkeys(key, serial);
+        return getRedis().hkeys(key, serial);
     }
 
     /**
@@ -207,7 +191,7 @@ public class UtilRedis {
      * @return
      */
     public static String get(String key, Serial serial) {
-        return defaultRedis.get(key, serial);
+        return getRedis().get(key, serial);
     }
 
     /**
@@ -218,8 +202,20 @@ public class UtilRedis {
      * @param serial
      * @return
      */
-    public static List<String> hmget(String key, String fields, Serial serial) {
-        return defaultRedis.hmget(key, fields, serial);
+    public static String hget(String key, String fields, Serial serial) {
+        return getRedis().hget(key, fields, serial);
+    }
+
+    /**
+     * 获取Hash表中的值
+     *
+     * @param key
+     * @param serial
+     * @param fields
+     * @return
+     */
+    public static List<String> hmget(String key, Serial serial, String fields) {
+        return getRedis().hmget(key, serial, fields);
     }
 
     /**
@@ -229,7 +225,7 @@ public class UtilRedis {
      * @param serial
      */
     public static void del(String key, Serial serial) {
-        defaultRedis.del(key, serial);
+        getRedis().del(key, serial);
     }
 
     /**
@@ -240,7 +236,7 @@ public class UtilRedis {
      * @return
      */
     public static Map<String, String> getByPrefix(String key, Serial serial) {
-        return defaultRedis.getByPrefix(key, serial);
+        return getRedis().getByPrefix(key, serial);
     }
 
     /**
@@ -251,7 +247,7 @@ public class UtilRedis {
      * @return
      */
     public static Map<String, String> getLikeKeys(String key, Serial serial) {
-        return defaultRedis.getLikeKeys(key, serial);
+        return getRedis().getLikeKeys(key, serial);
     }
 
     /**
@@ -261,7 +257,7 @@ public class UtilRedis {
      * @param serial
      */
     public static void delByPrefix(String key, Serial serial) {
-        defaultRedis.delByPrefix(key, serial);
+        getRedis().delByPrefix(key, serial);
     }
 
     /**
@@ -272,7 +268,7 @@ public class UtilRedis {
      * @param serial
      */
     public static void setData(String key, Data data, Serial serial) {
-        defaultRedis.set(key, data.toJsonStr(), serial);
+        getRedis().set(key, data.toJsonStr(), serial);
     }
 
     /**
@@ -284,7 +280,7 @@ public class UtilRedis {
      * @param serial
      */
     public static void setexData(String key, int seconds, Data data, Serial serial) {
-        defaultRedis.setex(key, seconds, data.toJsonStr(), serial);
+        getRedis().setex(key, seconds, data.toJsonStr(), serial);
     }
 
     /**
@@ -295,7 +291,7 @@ public class UtilRedis {
      * @return
      */
     public static Data getData(String key, Serial serial) {
-        return defaultRedis.getData(key, serial);
+        return getRedis().getData(key, serial);
     }
 
     /**
@@ -306,7 +302,7 @@ public class UtilRedis {
      * @param serial
      */
     public static void setDataList(String key, DataList dataList, Serial serial) {
-        defaultRedis.set(key, dataList.toJsonStr(), serial);
+        getRedis().set(key, dataList.toJsonStr(), serial);
     }
 
     /**
@@ -318,7 +314,7 @@ public class UtilRedis {
      * @param serial
      */
     public static void setexDataList(String key, int seconds, DataList dataList, Serial serial) {
-        defaultRedis.setex(key, seconds, dataList.toJsonStr(), serial);
+        getRedis().setex(key, seconds, dataList.toJsonStr(), serial);
     }
 
     /**
@@ -329,6 +325,6 @@ public class UtilRedis {
      * @return
      */
     public static DataList getDataList(String key, Serial serial) {
-        return defaultRedis.getDataList(key, serial);
+        return getRedis().getDataList(key, serial);
     }
 }

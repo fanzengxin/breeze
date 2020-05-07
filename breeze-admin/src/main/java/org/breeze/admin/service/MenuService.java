@@ -12,6 +12,7 @@ import org.breeze.core.bean.data.Data;
 import org.breeze.core.bean.data.DataList;
 import org.breeze.core.bean.log.Serial;
 import org.breeze.core.bean.login.LoginInfo;
+import org.breeze.core.utils.string.UtilString;
 
 /**
  * @description: 菜单服务层
@@ -130,9 +131,11 @@ public class MenuService {
         remove.add("id", id, true);
         DataList dataList = menuDao.find(remove, serial);
         if (dataList.size() == 1) {
-            Data rolePermissionRemove = new Data();
-            rolePermissionRemove.add("PERMISSION", dataList.getData(0).getString("MENU_PERMISSION"), true);
-            rolePermissionDao.remove(rolePermissionRemove, serial);
+            if (UtilString.isNotEmpty(dataList.getData(0).getString("MENU_PERMISSION"))) {
+                Data rolePermissionRemove = new Data();
+                rolePermissionRemove.add("PERMISSION", dataList.getData(0).getString("MENU_PERMISSION"), true);
+                rolePermissionDao.remove(rolePermissionRemove, serial);
+            }
             return menuDao.remove(remove, serial);
         }
         return 0;

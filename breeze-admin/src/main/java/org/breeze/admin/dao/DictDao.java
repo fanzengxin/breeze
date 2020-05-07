@@ -25,18 +25,17 @@ public interface DictDao extends BaseDao {
      * @param serial
      * @return
      */
-    @Select(sql = "select id, dict_code, dict_value, dict_desc, sort, remarks, create_time from sys_dict where " +
+    @Select(sql = "select id, dict_code, dict_value, dict_desc, value_type, dict_parent, sort, remarks, create_time from sys_dict where " +
             "1=1{and dict_parent = #:dictParent:#}{ and dict_code = #:dictCode:#}{ and dict_desc like #:%dictDesc%:#}" +
             "{ and dict_type = #:dictType:#} order by sort", type = OperationMethod.FIND_PAGE)
     DataList page(int page, int pageSize, String dictParent, String dictCode, String dictDesc, String dictType, Serial serial);
 
     /**
-     * 分页查询字典项列表
+     * 查询所有字典值
      *
-     * @param dictCode
      * @param serial
      * @return
      */
-    @Select(sql = "select dict_code, dict_value where dict_code = #:dictCode:# order by sort", type = OperationMethod.FIND_PAGE)
-    DataList page(String dictCode, Serial serial);
+    @Select(sql = "select dict_parent, dict_desc, dict_value, value_type from sys_dict where dict_type = 1 order by dict_parent, sort")
+    DataList getAllDictCode(Serial serial);
 }

@@ -8,7 +8,6 @@ import org.breeze.core.config.CommonConfig;
 import org.breeze.core.config.RedisConfig;
 import org.breeze.core.log.Log;
 import org.breeze.core.log.LogFactory;
-import org.breeze.core.utils.cache.UtilRedis;
 import org.breeze.core.utils.date.UtilDateTime;
 import org.breeze.core.utils.encry.Des3;
 import org.breeze.core.utils.string.UtilString;
@@ -17,6 +16,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Description: redis实体对象
@@ -33,8 +33,8 @@ public class Redis {
     public static final int REDIS_SYS_DB = 1;
     public static final int REDIS_LOGIN_DB = 2;
 
-    private static Map<String, JedisPool> redisInfos = new HashMap<String, JedisPool>();
-    private static Map<String, JSONObject> redisConfig = new HashMap<String, JSONObject>();
+    private static Map<String, JedisPool> redisInfos = new ConcurrentHashMap();
+    private static Map<String, JSONObject> redisConfig = new ConcurrentHashMap();
     private String name = null;
     private int db = 0;
 
@@ -54,6 +54,7 @@ public class Redis {
     }
 
     public Redis(String name, int db) {
+        System.out.println(db);
         this.name = name;
         this.db = db;
     }
@@ -110,9 +111,10 @@ public class Redis {
      * @return
      */
     private Jedis getJedis(Serial serial) {
-        JedisPool jedisPool = redisInfos.get(name);
+        String key = name + "___" + db;
+        JedisPool jedisPool = redisInfos.get(key);
         if (jedisPool == null) {
-            synchronized (name) {
+            synchronized (key) {
                 if (jedisPool == null) {
                     try {
                         JSONObject data = getRedisConfig(name);
@@ -150,7 +152,7 @@ public class Redis {
             }
         }
         if (jedisPool != null) {
-            synchronized (name) {
+            synchronized (key) {
                 Jedis resource = jedisPool.getResource();
                 return resource;
             }
@@ -352,7 +354,7 @@ public class Redis {
      * @param value
      * @param serial
      */
-    public void mset(String key, Map<String, String> value, Serial serial) {
+    public void hmset(String key, Map<String, String> value, Serial serial) {
         log.logDebug("redis插入多键值对数据{}", serial, key);
         Jedis jedis = null;
         try {
@@ -374,14 +376,14 @@ public class Redis {
      * @param value
      * @param serial
      */
-    public void hmset(String key, Map<String, String> value, Serial serial) {
-        log.logDebug("redis插入多键值对数据{}到Hash表", serial, key);
+    public void hset(String key, String field, String value, Serial serial) {
+        log.logDebug("redis插入数据{}到{}Hash表", serial, field, key);
         Jedis jedis = null;
         try {
             jedis = getJedis(serial);
-            jedis.hmset(key, value);
+            jedis.hset(key, field, value);
         } catch (Exception e) {
-            log.logError("redis:hmset操作出错！", e, serial);
+            log.logError("redis:hset操作出错！", e, serial);
         } finally {
             if (jedis != null) {
                 returnResource(jedis);
@@ -449,7 +451,33 @@ public class Redis {
      * @param serial
      * @return
      */
-    public List<String> hmget(String key, String fields, Serial serial) {
+    public String hget(String key, String fields, Serial serial) {
+        log.logDebug("redis获取Hash表{}数据{}", serial, key, fields);
+        Jedis jedis = null;
+        try {
+            jedis = getJedis(serial);
+            String value = jedis.hget(key, fields);
+            log.logDebug("redis获取数据{},{}={}", serial, key, fields, value);
+            return value;
+        } catch (Exception e) {
+            log.logError("redis:hget操作出错！", e, serial);
+            return null;
+        } finally {
+            if (jedis != null) {
+                returnResource(jedis);
+            }
+        }
+    }
+
+    /**
+     * 获取Hash表中的值
+     *
+     * @param key
+     * @param fields
+     * @param serial
+     * @return
+     */
+    public List<String> hmget(String key, Serial serial, String... fields) {
         log.logDebug("redis获取Hash表{}数据{}", serial, key, fields);
         Jedis jedis = null;
         try {
