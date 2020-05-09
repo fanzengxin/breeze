@@ -6,10 +6,10 @@
         <property name="charset">UTF-8</property>
     </properties>
     <appenders>
+        <withJansi>true</withJansi>
         <!--控制台日志-->
         <console name="console" target="SYSTEM_OUT">
-<!--            <PatternLayout pattern="[%d{YYYY-MM-dd HH:mm:ss.SSS}][%-1level][%thread][%logger]%msg%n"/>-->
-            <PatternLayout pattern="[%d{HH:mm:ss.SSS}]%msg%n"/>
+            <PatternLayout pattern="%yellow{%d{YYYY-MM-dd HH:mm:ss.SSS}} %highlight{%-5level} %style{%c{1.}logger}{blue} %msg%n"/>
         </console>
     </appenders>
     <loggers>

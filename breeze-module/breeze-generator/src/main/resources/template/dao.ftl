@@ -8,10 +8,10 @@ import org.breeze.core.constant.OperationMethod;
 import org.breeze.core.service.dao.BaseDao;
 
 /**
- * @Description: ${desc_function}
- * @Auther: ${desc_username}
- * @Date: ${desc_datetime}
- * @Version: 1.0.0
+ * @description: ${desc_function}
+ * @author: ${desc_username}
+ * @date: ${desc_datetime}
+ * @version: 1.0.0
  */
 @Repository(tableName = "${code_table_name}")
 public interface ${code_function}Dao extends BaseDao {
@@ -24,6 +24,6 @@ public interface ${code_function}Dao extends BaseDao {
      * @param serial
      * @return
      */
-    @Select(sql = "select * from breeze.${code_table_name} where 1=1", type = OperationMethod.FIND_PAGE)
-    DataList getPage(int page, int pageSize, Serial serial);
+    @Select(sql = "select ${sql_column} from breeze.${code_table_name} where 1=1${sql_search_column}", type = OperationMethod.FIND_PAGE)
+    DataList getPage(int page, int pageSize${search_param}, Serial serial);
 }

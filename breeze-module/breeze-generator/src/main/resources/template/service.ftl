@@ -11,10 +11,10 @@ import org.breeze.core.log.Log;
 import org.breeze.core.log.LogFactory;
 
 /**
- * @Description: ${desc_function}
- * @Auther: ${desc_username}
- * @Date: ${desc_datetime}
- * @Version: 1.0.0
+ * @description: ${desc_function}
+ * @author: ${desc_username}
+ * @date: ${desc_datetime}
+ * @version: 1.0.0
  */
 @Service
 public class ${code_function}Service {
@@ -28,12 +28,25 @@ public class ${code_function}Service {
      * 分页查询${desc_function}列表
      *
      * @param page
-     * @param pageSize
+     * @param pageSize ${search_doc}
      * @param serial
      * @return
      */
-    public DataList getPage(int page, int pageSize, Serial serial) {
-        return ${code_function_low}Dao.getPage(page, pageSize, serial);
+    public DataList getPage(int page, int pageSize${search_param}, Serial serial) {
+        return ${code_function_low}Dao.getPage(page, pageSize${search}, serial);
+    }
+
+    /**
+     * 获取单条${desc_function}信息
+     *
+     * @param ${primary_key}
+     * @param serial
+     * @return
+     */
+    public DataList get(String ${primary_key}, Serial serial) {
+        Data find = new Data();
+        find.add("${primary_key}", ${primary_key}, true);
+        return ${code_function_low}Dao.find(find, serial);
     }
 
     /**

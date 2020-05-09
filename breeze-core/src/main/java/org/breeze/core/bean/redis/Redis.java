@@ -54,7 +54,6 @@ public class Redis {
     }
 
     public Redis(String name, int db) {
-        System.out.println(db);
         this.name = name;
         this.db = db;
     }
