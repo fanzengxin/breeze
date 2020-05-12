@@ -165,7 +165,7 @@ public class DaoInterceptor implements MethodInterceptor {
                     if (fdList == null || fdList.size() == 0) {
                         return false;
                     }
-                    // 单条保存
+                    // 条件查询
                     result = getByData(ide, repository, (Data) fdList.get(0));
                     break;
                 case OperationMethod.BATCH_SAVE:

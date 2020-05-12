@@ -11,10 +11,10 @@ import org.breeze.core.log.Log;
 import org.breeze.core.log.LogFactory;
 
 /**
- * @Description: 测试
- * @Author: 系统管理员
- * @Date: 2020-05-09 18:14
- * @Version: 1.0.0
+ * @description: 测试
+ * @author: 系统管理员
+ * @date: 2020-05-11 17:14
+ * @version: 1.0.0
  */
 @Service
 public class TestService {
@@ -31,12 +31,11 @@ public class TestService {
      * @param pageSize 
 	 * @nama		姓名
 	 * @gender		性别
-	 * @age		年龄
      * @param serial
      * @return
      */
-    public DataList getPage(int page, int pageSize, String nama, String gender, String age, Serial serial) {
-        return testDao.getPage(page, pageSize, nama, gender, age, serial);
+    public DataList getPage(int page, int pageSize, String nama, String gender, Serial serial) {
+        return testDao.getPage(page, pageSize, nama, gender, serial);
     }
 
     /**

@@ -16,7 +16,7 @@ import org.breeze.core.log.LogFactory;
 /**
  * @description: 测试管理
  * @author: 系统管理员
- * @date: 2020-05-09 18:14
+ * @date: 2020-05-11 17:14
  * @version: 1.0.0
  */
 @Controller(mapper = "test")
@@ -34,7 +34,6 @@ public class TestController {
      * @param pageSize 
 	 * @nama		姓名
 	 * @gender		性别
-	 * @age		年龄
      * @param serial
      * @return
      */
@@ -42,13 +41,12 @@ public class TestController {
         @Param(name = "page", description = "当前页码"),
         @Param(name = "pageSize", description = "每页数据量"),
 		@Param(name = "nama", description = "姓名"),
-		@Param(name = "gender", description = "性别"),
-		@Param(name = "age", description = "年龄")
+		@Param(name = "gender", description = "性别")
     })
     @Permission(value = "test_list")
-    @Api(method = RequestMethod.GET)
-    public R page(int page, int pageSize, String nama, String gender, String age, Serial serial) {
-        DataList dataList = testService.getPage(page, pageSize, nama, gender, age, serial);
+    @Api(value = "page", method = RequestMethod.GET)
+    public R page(int page, int pageSize, String nama, String gender, Serial serial) {
+        DataList dataList = testService.getPage(page, pageSize, nama, gender, serial);
         return R.success(dataList);
     }
 

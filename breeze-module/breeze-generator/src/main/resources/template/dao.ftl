@@ -24,6 +24,6 @@ public interface ${code_function}Dao extends BaseDao {
      * @param serial
      * @return
      */
-    @Select(sql = "select ${sql_column} from breeze.${code_table_name} where 1=1${sql_search_column}", type = OperationMethod.FIND_PAGE)
+    @Select(sql = "select ${sql_column} from ${code_table_name} where 1=1${sql_search_column}", type = OperationMethod.FIND_PAGE)
     DataList getPage(int page, int pageSize${search_param}, Serial serial);
 }

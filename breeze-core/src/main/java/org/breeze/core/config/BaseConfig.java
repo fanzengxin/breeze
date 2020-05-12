@@ -77,6 +77,16 @@ public class BaseConfig {
     }
 
     /**
+     * 获取指定key对应的数据
+     *
+     * @param key        指定key
+     * @return
+     */
+    public static String getValueOrDefault(String key) {
+        return getValueOrDefault(key, "");
+    }
+
+    /**
      * 获取指定key对应的数据，如数据为空则取默认值
      *
      * @param key        指定key

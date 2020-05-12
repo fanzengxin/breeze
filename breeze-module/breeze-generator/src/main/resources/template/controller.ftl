@@ -40,7 +40,7 @@ public class ${code_function}Controller {
         @Param(name = "pageSize", description = "每页数据量")${search_an}
     })
     @Permission(value = "${code_permission}_list")
-    @Api(method = RequestMethod.GET)
+    @Api(value = "page", method = RequestMethod.GET)
     public R page(int page, int pageSize${search_param}, Serial serial) {
         DataList dataList = ${code_function_low}Service.getPage(page, pageSize${search}, serial);
         return R.success(dataList);

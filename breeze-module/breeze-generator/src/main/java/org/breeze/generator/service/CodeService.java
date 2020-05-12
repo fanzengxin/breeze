@@ -7,9 +7,11 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import org.breeze.core.annotation.service.Service;
 import org.breeze.core.bean.log.Serial;
+import org.breeze.core.config.FilePathConfig;
 import org.breeze.core.log.Log;
 import org.breeze.core.log.LogFactory;
 import org.breeze.core.utils.date.UtilDateTime;
+import org.breeze.core.utils.string.UUIDGenerator;
 import org.breeze.core.utils.string.UtilString;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,15 +50,24 @@ public class CodeService {
         Map<String, Object> ftlMap = getftlMap(packageCode, moduleCode, moduleName, moduleAuthor, dynamic, tableName, serial);
         // 获取配置文件
         Configuration configuration = new Configuration(Configuration.VERSION_2_3_29);
-        // 指定模板读取路径
-        configuration.setServletContextForTemplateLoading(request.getSession().getServletContext(), "/WEB-INF/classes/template");
-        String rootPath = "D://code";
         // 将包名中的.替换为路径/
         String packagePath = packageCode.replaceAll("\\.", "/");
-        createControllerFile(configuration, rootPath, packagePath, ftlMap, serial);
-        createServiceFile(configuration, rootPath, packagePath, ftlMap, serial);
-        createDaoFile(configuration, rootPath, packagePath, ftlMap, serial);
-        return null;
+        // 指定模板读取路径
+        configuration.setServletContextForTemplateLoading(request.getSession().getServletContext(), "/WEB-INF/classes/template");
+        String rootPath = FilePathConfig.getFilePathCodeTemplate() + File.separator + UUIDGenerator.JavaUUID();
+        // 生成controller文件
+        createControllerFile(configuration, rootPath + "/web", packagePath, ftlMap, serial);
+        // 生成service文件
+        createServiceFile(configuration, rootPath + "/web", packagePath, ftlMap, serial);
+        // 生成dao文件
+        createDaoFile(configuration, rootPath + "/web", packagePath, ftlMap, serial);
+        // 生成api.js文件
+        createApiJsFile(configuration, rootPath + "/ui/api", ftlMap.get("package_name").toString(), ftlMap, serial);
+        // 生成crud.js文件
+        createCrudJsFile(configuration, rootPath + "/ui/const/crud", ftlMap.get("package_name").toString(), ftlMap, serial);
+        // 生成index.vue文件
+        createVueJsFile(configuration, rootPath + "/ui/views", ftlMap.get("package_name").toString(), ftlMap, serial);
+        return rootPath;
     }
 
     /**
@@ -83,6 +94,8 @@ public class CodeService {
         // 封装配置参数
         Map<String, Object> ftlMap = new HashMap<String, Object>();
         ftlMap.put("code_package", packageCode);
+        String[] pps = packageCode.split("\\.");
+        ftlMap.put("package_name", pps[pps.length - 1]);
         ftlMap.put("code_function", code_function);
         ftlMap.put("code_function_low", code_function_low);
         ftlMap.put("desc_function", moduleName);
@@ -95,36 +108,112 @@ public class CodeService {
         StringBuffer search = new StringBuffer();
         StringBuffer show_column = new StringBuffer();
         StringBuffer sql_column = new StringBuffer();
+        StringBuffer crudColumns = new StringBuffer();
         JSONArray ja = JSONArray.parseArray(dynamic);
+        String dict_import = "";
         for (int i = 0; i < ja.size(); i++) {
             JSONObject json = ja.getJSONObject(i);
-            if (UtilString.isNotEmpty(json.getString("COLUMN_PK"))) {
-                ftlMap.put("primary_key", json.getString("COLUMN_NAME"));
+            String nameValue = json.getString("COLUMN_NAME");
+            String commentValue = json.getString("COLUMN_COMMENT");
+            boolean pkValue = checkJsonDataNotNull(json.getString("COLUMN_PK"));
+            boolean listValue = checkJsonDataNotNull(json.getString("COLUMN_LIST"));
+            boolean hideValue = checkJsonDataNotNull(json.getString("COLUMN_HIDE"));
+            boolean searchValue = checkJsonDataNotNull(json.getString("COLUMN_SEARCH"));
+            boolean viewValue = checkJsonDataNotNull(json.getString("COLUMN_VIEW"));
+            boolean addValue = checkJsonDataNotNull(json.getString("COLUMN_ADD"));
+            boolean editValue = checkJsonDataNotNull(json.getString("COLUMN_EDIT"));
+            boolean disabledValue = checkJsonDataNotNull(json.getString("COLUMN_DISABLED"));
+            boolean requiredValue = checkJsonDataNotNull(json.getString("COLUMN_REQUIRED"));
+            String typeValue = json.getString("INPUT_TYPE");
+            String dictValue = json.getString("INPUT_DICT");
+            if (pkValue) {
+                ftlMap.put("primary_key", nameValue);
             }
-            if (UtilString.isNotEmpty(json.getString("COLUMN_SEARCH"))) {
-                search_doc.append("\n\t * @").append(json.getString("COLUMN_NAME"))
-                        .append("\t\t").append(json.getString("COLUMN_COMMENT"));
-                search_an.append(",\n\t\t").append("@Param(name = \"").append(json.getString("COLUMN_NAME"))
-                        .append("\", description = \"").append(json.getString("COLUMN_COMMENT")).append("\")");
-                search_param.append(", String ").append(json.getString("COLUMN_NAME"));
-                show_column.append("{ and ").append(json.getString("COLUMN_NAME")).append(" = ").
-                        append("#:").append(json.getString("COLUMN_NAME")).append(":#}");
-                search.append(", ").append(json.getString("COLUMN_NAME"));
+            if (searchValue) {
+                search_doc.append("\n\t * @").append(nameValue)
+                        .append("\t\t").append(commentValue);
+                search_an.append(",\n\t\t").append("@Param(name = \"").append(nameValue)
+                        .append("\", description = \"").append(commentValue).append("\")");
+                search_param.append(", String ").append(nameValue);
+                show_column.append("{ and ").append(nameValue).append(" = ").
+                        append("#:").append(nameValue).append(":#}");
+                search.append(", ").append(nameValue);
             }
-            if (UtilString.isNotEmpty(json.getString("COLUMN_LIST"))) {
-                sql_column.append(", ").append(json.getString("COLUMN_NAME"));
+            if (listValue) {
+                sql_column.append(", ").append(nameValue);
+            }
+            if (pkValue || listValue || hideValue || searchValue || viewValue || addValue || editValue) {
+                if (crudColumns.length() > 0) {
+                    crudColumns.append(", ");
+                }
+                crudColumns.append("{\n    label: '").append(commentValue).append("'");
+                crudColumns.append(",\n    prop: '").append(nameValue).append("'");
+                crudColumns.append(",\n    align: 'center'");
+                if (hideValue) {
+                    crudColumns.append(",\n    hide: true");
+                }
+                if (!"text".equalsIgnoreCase(typeValue)) {
+                    crudColumns.append(",\n    type: '").append(typeValue).append("'");
+                    if ("datetime".equalsIgnoreCase(typeValue)) {
+                        crudColumns.append(",\n    format: 'yyyy-MM-dd HH:mm:ss'");
+                        crudColumns.append(",\n    valueFormat: 'timestamp'");
+                    }
+                }
+                if (!viewValue) {
+                    crudColumns.append(",\n    viewDisplay: false");
+                }
+                if (!addValue) {
+                    crudColumns.append(",\n    addDisplay: false");
+                }
+                if (!editValue) {
+                    crudColumns.append(",\n    editDisplay: false");
+                }
+                if (!disabledValue) {
+                    crudColumns.append(",\n    editDisabled: true");
+                }
+                if (UtilString.isNotEmpty(dictValue)) {
+                    dict_import = "import {getStoreDict} from '@/util/store'\n\n";
+                    crudColumns.append(",\n    dicData: getStoreDict('").append(dictValue).append("')");
+                }
+                if (requiredValue) {
+                    crudColumns.append(",\n    rules: [{\n").append("      required: true");
+                    crudColumns.append(",\n      message: '请输入").append(commentValue).append("'");
+                    crudColumns.append(",\n      trigger: 'blur'\n    }]");
+                }
+                crudColumns.append("\n  }");
             }
         }
+        ftlMap.put("dict_import", dict_import);
+        ftlMap.put("column_crud", crudColumns.toString());
         ftlMap.put("search_doc", search_doc.toString());
         ftlMap.put("search_an", search_an.toString());
         ftlMap.put("search_param", search_param.toString());
         ftlMap.put("search", search.toString());
         ftlMap.put("search_column", search.toString());
-        ftlMap.put("sql_column", sql_column.toString().length() > 2 ? search.toString().substring(2) : search.toString());
+        ftlMap.put("sql_column", sql_column.toString().length() > 2 ? sql_column.toString().substring(2) :
+                sql_column.toString());
+        if (ftlMap.get("primary_key") != null && !ftlMap.get("sql_column").toString().contains(ftlMap.get("primary_key").toString())) {
+            ftlMap.put("sql_column", ftlMap.get("sql_column").toString() + ", " + ftlMap.get("primary_key").toString());
+        }
         ftlMap.put("sql_search_column", show_column.toString());
         ftlMap.put("code_permission", code_function_low);
         ftlMap.put("code_table_name", tableName);
+        if (ftlMap.get("primary_key") != null) {
+            ftlMap.put("primary_key_upper", ftlMap.get("primary_key").toString().toUpperCase());
+        } else {
+            ftlMap.put("primary_key_upper", "");
+        }
         return ftlMap;
+    }
+
+    /**
+     * 检测json值是否为空
+     *
+     * @param value
+     * @return
+     */
+    private boolean checkJsonDataNotNull(String value) {
+        return UtilString.isNotEmpty(value) && !"[]".equalsIgnoreCase(value);
     }
 
     /**
@@ -138,27 +227,19 @@ public class CodeService {
      */
     private void createControllerFile(Configuration configuration, String rootPath, String packagePath,
                                       Map<String, Object> ftlMap, Serial serial) {
-        FileWriter cwriter = null;
-        try {
+        String pathName = rootPath + File.separator + packagePath + File.separator + "controller";
+        try (FileWriter cwriter = new FileWriter(new File(pathName + File.separator +
+                ftlMap.get("code_function") + "Controller.java"))) {
             // 读取controller模板
             Template ct = configuration.getTemplate("controller.ftl");
             // 生成controller文件
-            File cFile = new File(rootPath + File.separator + packagePath + File.separator + "controller");
+            File cFile = new File(pathName);
             if (!cFile.exists()) {
                 cFile.mkdirs();
             }
-            cwriter = new FileWriter(new File(rootPath + File.separator + packagePath + File.separator + "controller"
-                    + File.separator + ftlMap.get("code_function") + "Controller.java"));
             ct.process(ftlMap, cwriter);
         } catch (IOException | TemplateException e) {
             log.logError("生成Controller.java模板文件失败", serial, e);
-        } finally {
-            if (cwriter != null) {
-                try {
-                    cwriter.close();
-                } catch (IOException e) {
-                }
-            }
         }
     }
 
@@ -173,27 +254,18 @@ public class CodeService {
      */
     private void createServiceFile(Configuration configuration, String rootPath, String packagePath,
                                    Map<String, Object> ftlMap, Serial serial) {
-        FileWriter swriter = null;
-        try {
+        String pathName = rootPath + File.separator + packagePath + File.separator + "service";
+        try (FileWriter swriter = new FileWriter(new File(pathName + File.separator +
+                ftlMap.get("code_function") + "Service.java"))) {
             // 生成service文件
-            File sFile = new File(rootPath + File.separator + packagePath + File.separator + "service");
+            File sFile = new File(pathName);
             if (!sFile.exists()) {
                 sFile.mkdirs();
             }
             Template st = configuration.getTemplate("service.ftl");
-            swriter = new FileWriter(new File(rootPath + File.separator + packagePath + File.separator + "service"
-                    + File.separator + ftlMap.get("code_function") + "Service.java"));
             st.process(ftlMap, swriter);
-            swriter.close();
         } catch (IOException | TemplateException e) {
             log.logError("生成Service.java模板文件失败", serial, e);
-        } finally {
-            if (swriter != null) {
-                try {
-                    swriter.close();
-                } catch (IOException e) {
-                }
-            }
         }
     }
 
@@ -207,28 +279,96 @@ public class CodeService {
      * @param serial
      */
     private void createDaoFile(Configuration configuration, String rootPath, String packagePath,
-                                   Map<String, Object> ftlMap, Serial serial) {
-        FileWriter swriter = null;
-        try {
+                               Map<String, Object> ftlMap, Serial serial) {
+        String pathName = rootPath + File.separator + packagePath + File.separator + "dao";
+        try (FileWriter swriter = new FileWriter(new File(pathName + File.separator +
+                ftlMap.get("code_function") + "Dao.java"))) {
             // 生成service文件
-            File sFile = new File(rootPath + File.separator + packagePath + File.separator + "dao");
+            File sFile = new File(pathName);
             if (!sFile.exists()) {
                 sFile.mkdirs();
             }
             Template st = configuration.getTemplate("dao.ftl");
-            swriter = new FileWriter(new File(rootPath + File.separator + packagePath + File.separator + "dao"
-                    + File.separator + ftlMap.get("code_function") + "Dao.java"));
             st.process(ftlMap, swriter);
-            swriter.close();
         } catch (IOException | TemplateException e) {
             log.logError("生成Dao.java模板文件失败", serial, e);
-        } finally {
-            if (swriter != null) {
-                try {
-                    swriter.close();
-                } catch (IOException e) {
-                }
+        }
+    }
+
+    /**
+     * 生成api.js文件
+     *
+     * @param configuration
+     * @param rootPath
+     * @param packagePath
+     * @param ftlMap
+     * @param serial
+     */
+    private void createApiJsFile(Configuration configuration, String rootPath, String packagePath,
+                                 Map<String, Object> ftlMap, Serial serial) {
+        String pathName = rootPath + File.separator + packagePath;
+        try (FileWriter swriter = new FileWriter(new File(pathName + File.separator +
+                ftlMap.get("code_function_low") + ".js"))) {
+            // 生成service文件
+            File sFile = new File(pathName);
+            if (!sFile.exists()) {
+                sFile.mkdirs();
             }
+            Template st = configuration.getTemplate("api.ftl");
+            st.process(ftlMap, swriter);
+        } catch (IOException | TemplateException e) {
+            log.logError("生成api.js模板文件失败", serial, e);
+        }
+    }
+
+    /**
+     * 生成crud.js文件
+     *
+     * @param configuration
+     * @param rootPath
+     * @param packagePath
+     * @param ftlMap
+     * @param serial
+     */
+    private void createCrudJsFile(Configuration configuration, String rootPath, String packagePath,
+                                  Map<String, Object> ftlMap, Serial serial) {
+        String pathName = rootPath + File.separator + packagePath;
+        try (FileWriter swriter = new FileWriter(new File(pathName + File.separator +
+                ftlMap.get("code_function_low") + ".js"))) {
+            // 生成service文件
+            File sFile = new File(pathName);
+            if (!sFile.exists()) {
+                sFile.mkdirs();
+            }
+            Template st = configuration.getTemplate("crud.ftl");
+            st.process(ftlMap, swriter);
+        } catch (IOException | TemplateException e) {
+            log.logError("生成crud.js模板文件失败", serial, e);
+        }
+    }
+
+    /**
+     * 生成api.vue文件
+     *
+     * @param configuration
+     * @param rootPath
+     * @param packagePath
+     * @param ftlMap
+     * @param serial
+     */
+    private void createVueJsFile(Configuration configuration, String rootPath, String packagePath,
+                                 Map<String, Object> ftlMap, Serial serial) {
+        String pathName = rootPath + File.separator + packagePath + File.separator + ftlMap.get("code_function_low");
+        try (FileWriter swriter = new FileWriter(new File(pathName + File.separator + "index.vue"))) {
+            // 生成service文件
+            File sFile = new File(pathName);
+            if (!sFile.exists()) {
+                sFile.mkdirs();
+            }
+            Template st = configuration.getTemplate("vue.ftl");
+            st.process(ftlMap, swriter);
+        } catch (IOException | TemplateException e) {
+            log.logError("生成vue.js模板文件失败", serial, e);
         }
     }
 }

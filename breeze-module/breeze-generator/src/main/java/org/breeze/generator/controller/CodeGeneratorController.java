@@ -16,7 +16,6 @@ import org.breeze.generator.service.CodeService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * @description: 数据库链接查看
@@ -46,22 +45,13 @@ public class CodeGeneratorController {
     @Permission("tools_code_generator")
     @Api(value = "table", method = RequestMethod.GET)
     public R tableList(String connName, String dbName, Serial serial) {
-        Connection conn = null;
-        try {
-            conn = ConnectionManager.getConnection(connName);
+        try (Connection conn = ConnectionManager.getConnection(connName)) {
             IDataExecute ide = DataBaseFactory.getDataBase(conn);
             String sql = "SELECT TABLE_NAME, TABLE_COMMENT, TABLE_COLLATION, ENGINE, CREATE_TIME FROM information_schema.TABLES WHERE table_schema = ?";
             DataList dl = ide.findSql(sql, dbName);
             return R.success(dl);
         } catch (Exception e) {
             log.logError("数据库操作失败", e);
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException e1) {
-                }
-            }
         }
         return R.failure("查询数据表信息失败");
     }
@@ -74,9 +64,7 @@ public class CodeGeneratorController {
     @Permission("tools_code_generator")
     @Api(value = "column", method = RequestMethod.GET)
     public R columnList(String connName, String dbName, String tableName, Serial serial) {
-        Connection conn = null;
-        try {
-            conn = ConnectionManager.getConnection(connName);
+        try (Connection conn = ConnectionManager.getConnection(connName)) {
             IDataExecute ide = DataBaseFactory.getDataBase(conn);
             String sql = "SELECT COLUMN_NAME, COLUMN_TYPE, COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE " +
                     "TABLE_SCHEMA = ? AND TABLE_NAME = ? ORDER BY TABLE_NAME, ORDINAL_POSITION";
@@ -84,13 +72,6 @@ public class CodeGeneratorController {
             return R.success(dl);
         } catch (Exception e) {
             log.logError("数据库操作失败", e);
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException e1) {
-                }
-            }
         }
         return R.failure("查询数据表信息失败");
     }

@@ -3,4 +3,8 @@ base: # 基本信息
     id: 'generator'
     name: '代码生成器'
 
+file: #文件路径
+  path:
+    template: "D://code"
+
 
