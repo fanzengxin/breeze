@@ -41,7 +41,7 @@
 
         <!--web基础模块信息常量-->
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
-        <log4j2.version>2.11.1</log4j2.version>
+        <log4j2.version>2.13.3</log4j2.version>
         <disruptor.version>3.4.2</disruptor.version>
 
         <!--dom4j-->
