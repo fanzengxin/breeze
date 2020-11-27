@@ -34,13 +34,11 @@ public class UtilsZip {
         for (File file : files) {//文件
             if (file.isFile()) {
                 fileList.add(file);
-                System.out.println("add file:" + file.getName());
             } else {//目录
                 if (file.listFiles().length != 0) {//非空目录
                     fileList.addAll(getAllFile(file));//把递归文件加到fileList中
                 } else {//空目录
                     fileList.add(file);
-                    System.out.println("add empty dir:" + file.getName());
                 }
             }
         }
@@ -58,7 +56,9 @@ public class UtilsZip {
         String relativePath = file.getName();
         while (true) {
             file = file.getParentFile();
-            if (file == null) break;
+            if (file == null) {
+                break;
+            }
             if (file.equals(dirFile)) {
                 break;
             } else {
@@ -82,7 +82,7 @@ public class UtilsZip {
             if (!file.exists()) {
                 file.mkdirs();//文件对应目录若不存在，则创建
                 try {
-                    System.out.println("mkdirs: " + file.getCanonicalPath());
+                    file.getCanonicalPath();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -93,7 +93,7 @@ public class UtilsZip {
             if (!file.exists()) {//若目标路径的目录不存在，则创建
                 file.mkdirs();
                 try {
-                    System.out.println("mkdirs: " + file.getCanonicalPath());
+                    file.getCanonicalPath();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -144,11 +144,11 @@ public class UtilsZip {
                         zos.write(buffer, 0, readLength);
                     }
                     is.close();
-                    System.out.println("file compress:" + file.getCanonicalPath());
+                    file.getCanonicalPath();
                 } else {     //若是空目录，则写入zip条目中
                     zipEntry = new ZipEntry(getRelativePath(dirPath, file));
                     zos.putNextEntry(zipEntry);
-                    System.out.println("dir compress: " + file.getCanonicalPath() + "/");
+                    file.getCanonicalPath();
                 }
             }
             zos.close();  //最后得关闭流，不然压缩最后一个文件会出错
@@ -174,18 +174,18 @@ public class UtilsZip {
                     File file = new File(destPath + "/" + zipEntry.getName());
                     if (!file.exists()) {
                         file.mkdirs();
-                        System.out.println("mkdirs:" + file.getCanonicalPath());
+                        file.getCanonicalPath();
                         continue;
                     }
                 }//若是文件
                 File file = createFile(destPath, zipEntry.getName());
-                System.out.println("file created: " + file.getCanonicalPath());
+                file.getCanonicalPath();
                 OutputStream os = new FileOutputStream(file);
                 while ((readLength = zis.read(buffer, 0, BUFFER)) != -1) {
                     os.write(buffer, 0, readLength);
                 }
                 os.close();
-                System.out.println("file uncompressed: " + file.getCanonicalPath());
+                file.getCanonicalPath();
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -205,9 +205,11 @@ public class UtilsZip {
             for (File file : files) {
                 if (file.isDirectory()) {
                     deleteFolder(file);
+                } else {
+                    file.delete();
                 }
-                file.delete();
             }
         }
+        folder.delete();
     }
 }

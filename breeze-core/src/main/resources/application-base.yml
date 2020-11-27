@@ -19,9 +19,9 @@ security:
 database:
   default:
     # 连接驱动
-    driverClassName: 'org.mariadb.jdbc.Driver'
+    driverClassName: org.mariadb.jdbc.Driver
     # 连接地址
-    url: 'jdbc:mariadb://localhost:3306/breeze?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true'
+    url: jdbc:mariadb://localhost:3306/breeze?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
     # 用户名
     username: 'root'
     # 密码
@@ -59,7 +59,7 @@ redis:
   default:
     host: localhost
     port: 6379
-    password: 'tmduND95v3S5Csr2gLJ9xw=='
+    password: 'vyr2aufREVmAqWB4HyH0gQ=='
     max_active: 1024 # 可用连接实例的最大数目，默认值为8；如果赋值为-1，则表示不限制；如果pool已经分配了maxActive个jedis实例，则此时pool的状态为exhausted(耗尽)。
     max_idle: 200 # 控制一个pool最多有多少个状态为idle(空闲的)的jedis实例，默认值也是8。
     max_wait: 10000 # 等待可用连接的最大时间，单位毫秒，默认值为-1，表示永不超时。如果超过等待时间，则直接抛出JedisConnectionException；

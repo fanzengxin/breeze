@@ -12,9 +12,15 @@ import org.breeze.core.database.dbinterface.IDataExecute;
 import org.breeze.core.database.manager.ConnectionManager;
 import org.breeze.core.log.Log;
 import org.breeze.core.log.LogFactory;
+import org.breeze.core.utils.cache.UtilRedis;
+import org.breeze.core.utils.string.UUIDGenerator;
+import org.breeze.core.utils.string.UtilString;
 import org.breeze.generator.service.CodeService;
+import org.breeze.generator.util.UtilsZip;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.sql.Connection;
 
 /**
@@ -28,6 +34,8 @@ public class CodeGeneratorController {
 
     private static Log log = LogFactory.getLog(CodeGeneratorController.class);
 
+    private static final String GENERATOR_CODE_REDIS_KEY = "GENERATOR_CODE_REDIS_KEY_";
+
     @AutoAdd
     private CodeService codeService;
 
@@ -40,15 +48,20 @@ public class CodeGeneratorController {
      */
     @Params({
             @Param(name = "connName", description = "数据库连接名称", defaultValue = DataBaseConfig.DATABASE_DEFAULT_CONFIG),
-            @Param(name = "dbName", description = "数据库名称", required = true)
+            @Param(name = "dbName", description = "数据库名称", required = true),
+            @Param(name = "tableName", description = "数据表名称")
     })
     @Permission("tools_code_generator")
     @Api(value = "table", method = RequestMethod.GET)
-    public R tableList(String connName, String dbName, Serial serial) {
+    public R tableList(String connName, String dbName, String tableName, Serial serial) {
         try (Connection conn = ConnectionManager.getConnection(connName)) {
             IDataExecute ide = DataBaseFactory.getDataBase(conn);
             String sql = "SELECT TABLE_NAME, TABLE_COMMENT, TABLE_COLLATION, ENGINE, CREATE_TIME FROM information_schema.TABLES WHERE table_schema = ?";
-            DataList dl = ide.findSql(sql, dbName);
+            if (UtilString.isNotEmpty(tableName)) {
+                sql += " AND TABLE_NAME LIKE ?";
+                tableName = "%" + tableName + "%";
+            }
+            DataList dl = ide.findSql(sql, dbName, tableName);
             return R.success(dl);
         } catch (Exception e) {
             log.logError("数据库操作失败", e);
@@ -102,45 +115,52 @@ public class CodeGeneratorController {
     public R generator(HttpServletRequest request, String packageCode, String moduleCode, String moduleName,
                        String moduleAuthor, String dynamic, String tableName, Serial serial) {
         String codePath = codeService.generatorCode(request, packageCode, moduleCode, moduleName, moduleAuthor, dynamic, tableName, serial);
-//        try {
-//
-//            // 获取配置文件
-//            Configuration configuration = new Configuration(Configuration.VERSION_2_3_29);
-//            // 指定模板读取路径
-//            configuration.setServletContextForTemplateLoading(request.getSession().getServletContext(), "/WEB-INF/classes/template");
-//            // 读取controller模板
-//            Template ct = configuration.getTemplate("controller.ftl");
-//            // 将包名中的.替换为路径/
-//            String packagePath = packageName.replaceAll("\\.", "/");
-//            // 生成controller文件
-//            File cFile = new File(rootPath + File.separator + packagePath + File.separator + "controller");
-//            if (!cFile.exists()) {
-//                cFile.mkdirs();
-//            }
-//            FileWriter cwriter = new FileWriter(new File(rootPath + File.separator + packagePath + File.separator + "controller"
-//                    + File.separator + code_function + "Controller.java"));
-//            ct.process(ftlMap, cwriter);
-//            cwriter.close();
-//            // 生成service文件
-//            File sFile = new File(rootPath + File.separator + packagePath + File.separator + "service");
-//            if (!sFile.exists()) {
-//                sFile.mkdirs();
-//            }
-//            Template st = configuration.getTemplate("service.ftl");
-//            FileWriter swriter = new FileWriter(new File(rootPath + File.separator + packagePath + File.separator + "service"
-//                    + File.separator + code_function + "Service.java"));
-//            st.process(ftlMap, swriter);
-//            swriter.close();
-//            // 生成dao文件
-//            File dFile = new File(rootPath + File.separator + packagePath + File.separator + "dao");
-//            if (!dFile.exists()) {
-//                dFile.mkdirs();
-//            }
-//            Template dt = configuration.getTemplate("dao.ftl");
-//            FileWriter dwriter = new FileWriter(new File(rootPath + File.separator + packagePath + File.separator + "dao"
-//                    + File.separator + code_function + "Dao.java"));
-//            dt.process(ftlMap, dwriter);
-//            dwriter.close();
-        return R.success();
+        if (UtilString.isNotEmpty(codePath)) {
+            String codeId = UUIDGenerator.JavaUUID();
+            UtilRedis.set(GENERATOR_CODE_REDIS_KEY + codeId, codePath, serial);
+            return R.success(codeId);
+        } else {
+            return R.success();
+        }
+    }
+
+    /**
+     * 下载代码
+     *
+     * @param response response响应
+     * @param codeId   代码Id
+     * @param serial
+     * @return
+     */
+    @Params({
+            @Param(name = "codeId", description = "代码Key", required = true)
+    })
+    @Permission(login = false)
+    @Api(value = "download", method = RequestMethod.GET)
+    public void downloadCode(HttpServletResponse response, String codeId, Serial serial) {
+        String codePath = UtilRedis.get(GENERATOR_CODE_REDIS_KEY + codeId, serial);
+        try {
+            // path是指欲下载的文件的路径。
+            File file = new File(codePath);
+            // 以流的形式下载文件。
+            InputStream fis = new BufferedInputStream(new FileInputStream(codePath));
+            byte[] buffer = new byte[fis.available()];
+            fis.read(buffer);
+            fis.close();
+            // 清空response
+            response.reset();
+            // 设置response的Header
+            response.addHeader("Content-Disposition", "attachment;filename=code.zip");
+            response.addHeader("Content-Length", "" + file.length());
+            OutputStream toClient = new BufferedOutputStream(response.getOutputStream());
+            response.setContentType("application/octet-stream");
+            toClient.write(buffer);
+            toClient.flush();
+            toClient.close();
+        } catch (IOException ex) {
+            log.logError("代码生成失败", ex);
+        } finally {
+            new File(codePath).delete();
+        }
     }
 }

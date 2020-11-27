@@ -36,13 +36,21 @@ public class BeanFactory {
 
     private static Log log = LogFactory.getLog(BeanFactory.class);
 
-    // service 请求配置信息map
-    private static Map<String, ApiConfig> apiConfigMap = new HashMap<String, ApiConfig>();
-    // service 实例map
+    /**
+     * service 请求配置信息map
+     */
+    private static Map<String, ApiConfig> apiConfigMap = new HashMap<>();
+    /**
+     * service 实例map
+     */
     private static Map<Class<?>, Object> controllerMap = new HashMap<>();
-    // handler 实例map
+    /**
+     * handler 实例map
+     */
     private static Map<Class<?>, Object> handlerMap = new HashMap<>();
-    // repository 实例map
+    /**
+     * repository 实例map
+     */
     private static Map<Class<?>, Object> repositoryMap = new HashMap<>();
 
     private static final String API_BEAN_KEY_KEY = "_##_";
@@ -157,6 +165,7 @@ public class BeanFactory {
         // 如果存在 就获取包下的所有文件 包括目录
         File[] dirfiles = dir.listFiles(new FileFilter() {
             // 自定义过滤规则 如果可以循环(包含子目录) 或则是以.class结尾的文件(编译好的java类文件)
+            @Override
             public boolean accept(File file) {
                 return (recursive && file.isDirectory()) || (file.getName().endsWith(".class"));
             }

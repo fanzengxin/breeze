@@ -44,6 +44,7 @@ public class CoreInitListener implements ServletContextListener {
      *
      * @param servletContextEvent
      */
+    @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         log.logInfo("系统关闭...");
     }

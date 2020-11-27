@@ -13,6 +13,7 @@ import org.breeze.core.log.LogFactory;
 import org.breeze.core.utils.date.UtilDateTime;
 import org.breeze.core.utils.string.UUIDGenerator;
 import org.breeze.core.utils.string.UtilString;
+import org.breeze.generator.util.UtilsZip;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -67,7 +68,9 @@ public class CodeService {
         createCrudJsFile(configuration, rootPath + "/ui/const/crud", ftlMap.get("package_name").toString(), ftlMap, serial);
         // 生成index.vue文件
         createVueJsFile(configuration, rootPath + "/ui/views", ftlMap.get("package_name").toString(), ftlMap, serial);
-        return rootPath;
+        UtilsZip.compress(rootPath);
+        UtilsZip.deleteFolder(new File(rootPath));
+        return rootPath + ".zip";
     }
 
     /**
@@ -228,15 +231,15 @@ public class CodeService {
     private void createControllerFile(Configuration configuration, String rootPath, String packagePath,
                                       Map<String, Object> ftlMap, Serial serial) {
         String pathName = rootPath + File.separator + packagePath + File.separator + "controller";
+        // 生成controller文件
+        File cFile = new File(pathName);
+        if (!cFile.exists()) {
+            cFile.mkdirs();
+        }
         try (FileWriter cwriter = new FileWriter(new File(pathName + File.separator +
                 ftlMap.get("code_function") + "Controller.java"))) {
             // 读取controller模板
             Template ct = configuration.getTemplate("controller.ftl");
-            // 生成controller文件
-            File cFile = new File(pathName);
-            if (!cFile.exists()) {
-                cFile.mkdirs();
-            }
             ct.process(ftlMap, cwriter);
         } catch (IOException | TemplateException e) {
             log.logError("生成Controller.java模板文件失败", serial, e);
@@ -255,13 +258,13 @@ public class CodeService {
     private void createServiceFile(Configuration configuration, String rootPath, String packagePath,
                                    Map<String, Object> ftlMap, Serial serial) {
         String pathName = rootPath + File.separator + packagePath + File.separator + "service";
+        // 生成service文件
+        File sFile = new File(pathName);
+        if (!sFile.exists()) {
+            sFile.mkdirs();
+        }
         try (FileWriter swriter = new FileWriter(new File(pathName + File.separator +
                 ftlMap.get("code_function") + "Service.java"))) {
-            // 生成service文件
-            File sFile = new File(pathName);
-            if (!sFile.exists()) {
-                sFile.mkdirs();
-            }
             Template st = configuration.getTemplate("service.ftl");
             st.process(ftlMap, swriter);
         } catch (IOException | TemplateException e) {
@@ -281,13 +284,13 @@ public class CodeService {
     private void createDaoFile(Configuration configuration, String rootPath, String packagePath,
                                Map<String, Object> ftlMap, Serial serial) {
         String pathName = rootPath + File.separator + packagePath + File.separator + "dao";
+        // 生成service文件
+        File sFile = new File(pathName);
+        if (!sFile.exists()) {
+            sFile.mkdirs();
+        }
         try (FileWriter swriter = new FileWriter(new File(pathName + File.separator +
                 ftlMap.get("code_function") + "Dao.java"))) {
-            // 生成service文件
-            File sFile = new File(pathName);
-            if (!sFile.exists()) {
-                sFile.mkdirs();
-            }
             Template st = configuration.getTemplate("dao.ftl");
             st.process(ftlMap, swriter);
         } catch (IOException | TemplateException e) {
@@ -307,13 +310,13 @@ public class CodeService {
     private void createApiJsFile(Configuration configuration, String rootPath, String packagePath,
                                  Map<String, Object> ftlMap, Serial serial) {
         String pathName = rootPath + File.separator + packagePath;
+        // 生成service文件
+        File sFile = new File(pathName);
+        if (!sFile.exists()) {
+            sFile.mkdirs();
+        }
         try (FileWriter swriter = new FileWriter(new File(pathName + File.separator +
                 ftlMap.get("code_function_low") + ".js"))) {
-            // 生成service文件
-            File sFile = new File(pathName);
-            if (!sFile.exists()) {
-                sFile.mkdirs();
-            }
             Template st = configuration.getTemplate("api.ftl");
             st.process(ftlMap, swriter);
         } catch (IOException | TemplateException e) {
@@ -333,13 +336,13 @@ public class CodeService {
     private void createCrudJsFile(Configuration configuration, String rootPath, String packagePath,
                                   Map<String, Object> ftlMap, Serial serial) {
         String pathName = rootPath + File.separator + packagePath;
+        // 生成service文件
+        File sFile = new File(pathName);
+        if (!sFile.exists()) {
+            sFile.mkdirs();
+        }
         try (FileWriter swriter = new FileWriter(new File(pathName + File.separator +
                 ftlMap.get("code_function_low") + ".js"))) {
-            // 生成service文件
-            File sFile = new File(pathName);
-            if (!sFile.exists()) {
-                sFile.mkdirs();
-            }
             Template st = configuration.getTemplate("crud.ftl");
             st.process(ftlMap, swriter);
         } catch (IOException | TemplateException e) {
@@ -359,12 +362,12 @@ public class CodeService {
     private void createVueJsFile(Configuration configuration, String rootPath, String packagePath,
                                  Map<String, Object> ftlMap, Serial serial) {
         String pathName = rootPath + File.separator + packagePath + File.separator + ftlMap.get("code_function_low");
+        // 生成service文件
+        File sFile = new File(pathName);
+        if (!sFile.exists()) {
+            sFile.mkdirs();
+        }
         try (FileWriter swriter = new FileWriter(new File(pathName + File.separator + "index.vue"))) {
-            // 生成service文件
-            File sFile = new File(pathName);
-            if (!sFile.exists()) {
-                sFile.mkdirs();
-            }
             Template st = configuration.getTemplate("vue.ftl");
             st.process(ftlMap, swriter);
         } catch (IOException | TemplateException e) {
