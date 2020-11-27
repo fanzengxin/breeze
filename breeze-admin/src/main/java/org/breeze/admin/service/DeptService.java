@@ -26,7 +26,6 @@ public class DeptService {
     @AutoAdd
     private DeptDao deptDao;
 
-
     /**
      * 获取部门树
      *
