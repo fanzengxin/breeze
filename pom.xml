@@ -16,38 +16,25 @@
         <module>breeze-module</module>
     </modules>
 
-<!--    <repositories>-->
-<!--        <repository>-->
-<!--            &lt;!&ndash; Maven 私服 &ndash;&gt;-->
-<!--            <id>nexus</id>-->
-<!--            <name>Nexus Repository</name>-->
-<!--            <url>http://192.168.2.100:8081/repository/maven-public/</url>-->
-<!--        </repository>-->
-<!--    </repositories>-->
-
     <!--定义全局常量-->
     <properties>
         <!--字符编码集-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!--java编译版本-->
         <java.compiler.version>1.8</java.compiler.version>
-
         <!--maven插件版本-->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-dependency-plugin.version>3.1.0</maven-dependency-plugin.version>
         <maven-war-plugin.version>3.2.3</maven-war-plugin.version>
-
         <!--web基础模块信息常量-->
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <log4j2.version>2.13.3</log4j2.version>
         <disruptor.version>3.4.2</disruptor.version>
-
         <!--dom4j-->
         <dom4j.version>1.6</dom4j.version>
         <jaxen.version>1.1.6</jaxen.version>
-
         <!--commons模块-->
         <commons.version>3.7</commons.version>
         <commons-collections4.version>4.1</commons-collections4.version>
@@ -59,7 +46,6 @@
         <commons-pool.version>2.5.0</commons-pool.version>
         <cglib.version>3.2.10</cglib.version>
         <jedis.version>3.1.0</jedis.version>
-
         <!--网络模块-->
         <httpclient.version>4.5.7</httpclient.version>
         <!--cglib-->
@@ -67,100 +53,141 @@
         <!--druid数据库连接池-->
         <druid.version>1.1.13</druid.version>
         <!--JSON-->
-        <fastjson.version>1.2.62</fastjson.version>
+        <fastjson.version>1.2.75</fastjson.version>
         <!--redis-jedis-->
         <jedis.version>3.1.0</jedis.version>
         <!--yml文件解析-->
         <yaml.version>1.25</yaml.version>
-
         <!--mariadb-->
         <mariadb.version>2.6.0</mariadb.version>
-
         <!--freemarker-->
         <freemarker.version>2.3.29</freemarker.version>
-
         <!--jsoup-->
         <jsoup.version>1.12.1</jsoup.version>
-
     </properties>
 
-    <!--定义jar包依赖-->
-    <dependencies>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>${javax.servlet-api.version}</version>
-        </dependency>
-
-        <!--log4j2 日志-->
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>${log4j2.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>${log4j2.version}</version>
-        </dependency>
-
-        <!--异步日志并发用到的jar-->
-        <dependency>
-            <groupId>com.lmax</groupId>
-            <artifactId>disruptor</artifactId>
-            <version>${disruptor.version}</version>
-        </dependency>
-
-        <!--HttpClient-->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${httpclient.version}</version>
-        </dependency>
-
-        <!--cglib方法-->
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <version>${cglib.version}</version>
-        </dependency>
-
-        <!--druid数据库连接池-->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
-            <version>${druid.version}</version>
-        </dependency>
-
-        <!--JSON-->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>${fastjson.version}</version>
-        </dependency>
-
-        <!--redis客户端-->
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>${jedis.version}</version>
-        </dependency>
-
-
-        <!-- yaml格式文件解析 -->
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>${yaml.version}</version>
-        </dependency>
-
-        <!-- mariadb -->
-        <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <version>${mariadb.version}</version>
-        </dependency>
-    </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>${javax.servlet-api.version}</version>
+            </dependency>
+            <!--log4j2 日志-->
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j2.version}</version>
+            </dependency>
+            <!--异步日志并发用到的jar-->
+            <dependency>
+                <groupId>com.lmax</groupId>
+                <artifactId>disruptor</artifactId>
+                <version>${disruptor.version}</version>
+            </dependency>
+            <!--HttpClient-->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpclient.version}</version>
+            </dependency>
+            <!--cglib方法-->
+            <dependency>
+                <groupId>cglib</groupId>
+                <artifactId>cglib</artifactId>
+                <version>${cglib.version}</version>
+            </dependency>
+            <!--druid数据库连接池-->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+            <!--JSON-->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+            <!--redis客户端-->
+            <dependency>
+                <groupId>redis.clients</groupId>
+                <artifactId>jedis</artifactId>
+                <version>${jedis.version}</version>
+            </dependency>
+            <!-- yaml格式文件解析 -->
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${yaml.version}</version>
+            </dependency>
+            <!-- mariadb -->
+            <dependency>
+                <groupId>org.mariadb.jdbc</groupId>
+                <artifactId>mariadb-java-client</artifactId>
+                <version>${mariadb.version}</version>
+            </dependency>
+            <!--commons-->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons.version}</version>
+            </dependency>
+            <!--commons-collections4集合相关-->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons-collections4.version}</version>
+            </dependency>
+            <!--commons-beanutils java bean管理-->
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>${commons-beanutils.version}</version>
+            </dependency>
+            <!--commons-codec 编解码相关-->
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${commons-codec.version}</version>
+            </dependency>
+            <!--commons-dbutils jdbc封装-->
+            <dependency>
+                <groupId>commons-dbutils</groupId>
+                <artifactId>commons-dbutils</artifactId>
+                <version>${commons-dbutils.version}</version>
+            </dependency>
+            <!--IO输入/输出-->
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+            <!--文件上传-->
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>${commons-fileupload.version}</version>
+            </dependency>
+            <!--对象池-->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-pool2</artifactId>
+                <version>${commons-pool.version}</version>
+            </dependency>
+            <!-- jsoup爬虫相关jar -->
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${jsoup.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
