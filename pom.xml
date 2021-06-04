@@ -47,7 +47,7 @@
         <cglib.version>3.2.10</cglib.version>
         <jedis.version>3.1.0</jedis.version>
         <!--网络模块-->
-        <httpclient.version>4.5.7</httpclient.version>
+        <httpclient.version>4.5.13</httpclient.version>
         <!--cglib-->
         <cglib.version>3.2.10</cglib.version>
         <!--druid数据库连接池-->
