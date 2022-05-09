@@ -86,7 +86,7 @@ public class CodeGeneratorController {
      * @param moduleAuthor 代码小写
      * @param dynamic      模块名称
      * @param tableName    数据表名
-     * @param serial
+     * @param serial       请求序列号
      * @return
      */
     @Params({
