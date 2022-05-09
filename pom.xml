@@ -23,43 +23,43 @@
         <!--java编译版本-->
         <java.compiler.version>1.8</java.compiler.version>
         <!--maven插件版本-->
-        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-        <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
-        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
-        <maven-dependency-plugin.version>3.1.0</maven-dependency-plugin.version>
-        <maven-war-plugin.version>3.2.3</maven-war-plugin.version>
+        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+        <maven-deploy-plugin.version>3.0.0-M2</maven-deploy-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M6</maven-surefire-plugin.version>
+        <maven-dependency-plugin.version>3.3.0</maven-dependency-plugin.version>
+        <maven-war-plugin.version>3.3.2</maven-war-plugin.version>
         <!--web基础模块信息常量-->
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
-        <log4j2.version>2.13.3</log4j2.version>
-        <disruptor.version>3.4.2</disruptor.version>
+        <log4j2.version>2.17.2</log4j2.version>
+        <disruptor.version>4.0.0.RC1</disruptor.version>
         <!--dom4j-->
         <dom4j.version>1.6</dom4j.version>
         <jaxen.version>1.1.6</jaxen.version>
         <!--commons模块-->
-        <commons.version>3.7</commons.version>
-        <commons-collections4.version>4.1</commons-collections4.version>
-        <commons-beanutils.version>1.9.3</commons-beanutils.version>
-        <commons-codec.version>1.10</commons-codec.version>
-        <commons-dbutils.version>1.6</commons-dbutils.version>
+        <commons.version>3.12.0</commons.version>
+        <commons-collections4.version>4.4</commons-collections4.version>
+        <commons-beanutils.version>1.9.4</commons-beanutils.version>
+        <commons-codec.version>1.15</commons-codec.version>
+        <commons-dbutils.version>1.7</commons-dbutils.version>
         <commons-io.version>2.6</commons-io.version>
         <commons-fileupload.version>1.3.3</commons-fileupload.version>
         <commons-pool.version>2.5.0</commons-pool.version>
-        <cglib.version>3.2.10</cglib.version>
-        <jedis.version>3.1.0</jedis.version>
+        <cglib.version>3.3.0</cglib.version>
+        <jedis.version>4.2.2</jedis.version>
         <!--网络模块-->
-        <httpclient.version>4.5.7</httpclient.version>
+        <httpclient.version>4.5.13</httpclient.version>
         <!--cglib-->
         <cglib.version>3.2.10</cglib.version>
         <!--druid数据库连接池-->
-        <druid.version>1.1.13</druid.version>
+        <druid.version>1.2.9</druid.version>
         <!--JSON-->
-        <fastjson.version>1.2.75</fastjson.version>
+        <fastjson.version>2.0.2</fastjson.version>
         <!--redis-jedis-->
         <jedis.version>3.1.0</jedis.version>
         <!--yml文件解析-->
-        <yaml.version>1.25</yaml.version>
+        <yaml.version>1.30</yaml.version>
         <!--mariadb-->
-        <mariadb.version>2.6.0</mariadb.version>
+        <mariadb.version>3.0.4</mariadb.version>
         <!--freemarker-->
         <freemarker.version>2.3.29</freemarker.version>
         <!--jsoup-->
