@@ -1,6 +1,5 @@
 package org.breeze.admin.controller;
 
-import com.alibaba.fastjson.JSONArray;
 import org.breeze.admin.service.DeptService;
 import org.breeze.core.annotation.common.AutoAdd;
 import org.breeze.core.annotation.controller.*;
@@ -37,8 +36,7 @@ public class DeptController {
     @Permission("sys_dept_tree")
     @Api(value = "tree", method = RequestMethod.GET)
     public R tree(Serial serial) {
-        JSONArray result = deptService.getDeptTree(serial);
-        return R.success(result);
+        return R.success(deptService.getDeptTree(serial));
     }
 
     /**
@@ -52,8 +50,7 @@ public class DeptController {
     })
     @Api(method = RequestMethod.GET)
     public R list(Long id, Serial serial) {
-        DataList result = deptService.getDeptList(id, serial);
-        return R.success(result);
+        return R.success(deptService.getDeptList(id, serial));
     }
 
     /**

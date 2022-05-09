@@ -116,7 +116,7 @@ public class DictService {
         }
         Map<String, String> resultMap = new HashMap<>();
         for (Map.Entry<String, JSONArray> entry : map.entrySet()) {
-            resultMap.put(entry.getKey(), entry.getValue().toJSONString());
+            resultMap.put(entry.getKey(), entry.getValue().toString());
         }
         UtilRedis.hmset(DICT_CACHE_REDIS_KEY, resultMap, serial);
         UtilRedis.set(DICT_CACHE_REDIS_KEY_LAST_UPDATE_TIME,

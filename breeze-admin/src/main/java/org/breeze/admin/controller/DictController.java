@@ -41,8 +41,7 @@ public class DictController {
     @Permission("sys_dict_list")
     @Api(value = "page", method = RequestMethod.GET)
     public R page(int page, int pageSize, String dictParent, String dictCode, String dictDesc, String dictType, Serial serial) {
-        DataList dataList = dictService.page(page, pageSize, dictParent, dictCode, dictDesc, dictType, serial);
-        return R.success(dataList);
+        return R.success(dictService.page(page, pageSize, dictParent, dictCode, dictDesc, dictType, serial));
     }
 
     /**

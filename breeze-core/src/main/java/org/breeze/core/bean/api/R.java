@@ -105,7 +105,7 @@ public class R {
      * @return
      */
     public static R success(JSONArray jsonArray) {
-        return new R(ResponseCode.SUCCESS, ResponseCode.SUCCESS_MSG, jsonArray.toJSONString());
+        return new R(ResponseCode.SUCCESS, ResponseCode.SUCCESS_MSG, jsonArray.toString());
     }
 
     /**
