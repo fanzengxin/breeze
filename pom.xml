@@ -64,6 +64,8 @@
         <freemarker.version>2.3.29</freemarker.version>
         <!--jsoup-->
         <jsoup.version>1.12.1</jsoup.version>
+        <!--minio-->
+        <minio.version>8.4.0</minio.version>
     </properties>
 
     <dependencyManagement>
@@ -185,6 +187,12 @@
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
                 <version>${jsoup.version}</version>
+            </dependency>
+            <!--minio-->
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
