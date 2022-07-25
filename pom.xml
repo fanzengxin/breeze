@@ -31,7 +31,7 @@
         <!--web基础模块信息常量-->
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <log4j2.version>2.17.2</log4j2.version>
-        <disruptor.version>4.0.0.RC1</disruptor.version>
+        <disruptor.version>3.4.4</disruptor.version>
         <!--dom4j-->
         <dom4j.version>1.6</dom4j.version>
         <jaxen.version>1.1.6</jaxen.version>
@@ -53,19 +53,19 @@
         <!--druid数据库连接池-->
         <druid.version>1.2.9</druid.version>
         <!--JSON-->
-        <fastjson.version>2.0.2</fastjson.version>
+        <fastjson.version>2.0.10</fastjson.version>
         <!--redis-jedis-->
         <jedis.version>3.1.0</jedis.version>
         <!--yml文件解析-->
         <yaml.version>1.30</yaml.version>
         <!--mariadb-->
-        <mariadb.version>3.0.4</mariadb.version>
+        <mariadb.version>3.0.6</mariadb.version>
         <!--freemarker-->
         <freemarker.version>2.3.29</freemarker.version>
         <!--jsoup-->
         <jsoup.version>1.12.1</jsoup.version>
         <!--minio-->
-        <minio.version>8.4.0</minio.version>
+        <minio.version>8.4.3</minio.version>
     </properties>
 
     <dependencyManagement>
