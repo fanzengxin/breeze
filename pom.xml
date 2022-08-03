@@ -45,7 +45,6 @@
         <commons-fileupload.version>1.3.3</commons-fileupload.version>
         <commons-pool.version>2.5.0</commons-pool.version>
         <cglib.version>3.3.0</cglib.version>
-        <jedis.version>4.2.2</jedis.version>
         <!--网络模块-->
         <httpclient.version>4.5.13</httpclient.version>
         <!--cglib-->
@@ -55,7 +54,7 @@
         <!--JSON-->
         <fastjson.version>2.0.10</fastjson.version>
         <!--redis-jedis-->
-        <jedis.version>3.1.0</jedis.version>
+        <jedis.version>4.2.3</jedis.version>
         <!--yml文件解析-->
         <yaml.version>1.30</yaml.version>
         <!--mariadb-->

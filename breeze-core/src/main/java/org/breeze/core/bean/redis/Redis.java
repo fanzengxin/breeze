@@ -11,9 +11,11 @@ import org.breeze.core.log.LogFactory;
 import org.breeze.core.utils.date.UtilDateTime;
 import org.breeze.core.utils.encry.Des3;
 import org.breeze.core.utils.string.UtilString;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.*;
+import redis.clients.jedis.params.XAddParams;
+import redis.clients.jedis.params.XReadGroupParams;
+import redis.clients.jedis.params.XReadParams;
+import redis.clients.jedis.resps.StreamEntry;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,6 +34,14 @@ public class Redis {
     public static final int REDIS_DEFAULT_DB = 0;
     public static final int REDIS_SYS_DB = 1;
     public static final int REDIS_LOGIN_DB = 2;
+
+    /**
+     * 静态xadd参数，最大长度1000000，近似匹配，消费需要确认
+     */
+    private static XAddParams STATIC_XADD_PARAMS = XAddParams.xAddParams()
+            .approximateTrimming()
+            .noMkStream()
+            .maxLen(1000000);
 
     private static Map<String, JedisPool> redisInfos = new ConcurrentHashMap();
     private static Map<String, JSONObject> redisConfig = new ConcurrentHashMap();
@@ -685,5 +695,144 @@ public class Redis {
         } else {
             return DataList.parseDataList(value);
         }
+    }
+
+    /**
+     * 添加消费者组
+     *
+     * @param key
+     * @param groupName
+     */
+    public String xgroupCreate(String key, String groupName, Serial serial) {
+        return xgroupCreate(key, groupName, true, serial);
+    }
+
+    /**
+     * 添加消费者组
+     *
+     * @param key       队列名称
+     * @param groupName 消费者组名
+     * @param fromHead  消费方式（默认从头部读取）
+     */
+    public String xgroupCreate(String key, String groupName, boolean fromHead, Serial serial) {
+        log.logDebug("向 redis 队列 [{}] 中添加分组 [{}]", key, groupName);
+        Jedis jedis = null;
+        try {
+            jedis = getJedis(serial);
+            if (fromHead) {
+                // 从头开始消费
+                return jedis.xgroupCreate(key, groupName, new StreamEntryID(0, 0), true);
+            } else {
+                // 从尾部开始消费
+                return jedis.xgroupCreate(key, groupName, StreamEntryID.LAST_ENTRY, true);
+            }
+        } catch (Exception e) {
+            if (e.getMessage().indexOf("already exists") > -1) {
+                log.logDebug("队列 [{}] 分组 [{}] 已存在", key, groupName);
+            } else {
+                log.logError("redis:xadd操作出错!", e);
+            }
+        } finally {
+            returnResource(jedis);
+        }
+        return null;
+    }
+
+    /**
+     * 生产者 生产数据
+     *
+     * @param key   队列名称
+     * @param value 消息数据
+     */
+    public String xadd(String key, Map<String, String> value, Serial serial) {
+        log.logDebug("向 redis 队列 [{}] 中添加数据: [{}]", key, value);
+        Jedis jedis = null;
+        try {
+            jedis = getJedis(serial);
+            // 向队列里添加数据
+            StreamEntryID id = jedis.xadd(key, STATIC_XADD_PARAMS, value);
+            if (id != null) {
+                return id.toString();
+            }
+        } catch (Exception e) {
+            log.logError("redis:xadd操作出错!", e);
+        } finally {
+            returnResource(jedis);
+        }
+        return null;
+    }
+
+    /**
+     * 分组消费队列
+     *
+     * @param key
+     * @param groupName
+     * @param consumerName
+     * @param count
+     * @return
+     */
+    public List<Map.Entry<String, List<StreamEntry>>> xreadGroup(String key, String groupName, String consumerName, int count, Serial serial) {
+        log.logDebug("消费者 [{}] 从 redis 消费组中消费 [{}] 条数据。", consumerName, groupName, count);
+        Jedis jedis = null;
+        Map<String, StreamEntryID> streams = new HashMap<>();
+        streams.put(key, StreamEntryID.UNRECEIVED_ENTRY);
+        try {
+            jedis = getJedis(serial);
+            return jedis.xreadGroup(groupName, consumerName, new XReadGroupParams()
+                    .count(count), streams);
+        } catch (Exception e) {
+            log.logError("redis:xread-group操作出错！", e);
+        } finally {
+            returnResource(jedis);
+        }
+        return null;
+    }
+
+    /**
+     * 消费队列
+     *
+     * @param key
+     * @param count
+     * @return
+     */
+    public List<Map.Entry<String, List<StreamEntry>>> xread(String key, int count, Serial serial) {
+        log.logDebug("从 redis 队列 [{}] 消费 [{}] 条数据。", key, count);
+        Jedis jedis = null;
+        Map<String, StreamEntryID> streams = new HashMap<>();
+        streams.put(key, StreamEntryID.UNRECEIVED_ENTRY);
+        try {
+            jedis = getJedis(serial);
+            return jedis.xread(new XReadParams()
+                    .count(count), streams);
+        } catch (Exception e) {
+            log.logError("redis:xread-group操作出错！", e);
+        } finally {
+            returnResource(jedis);
+        }
+        return null;
+    }
+
+    /**
+     * 确认消费
+     *
+     * @param key
+     * @param group
+     * @param ids
+     * @return
+     */
+    public long xack(String key, String group, Serial serial, StreamEntryID... ids) {
+        log.logDebug("redis 队列 [{}]-[{}] 确认消费 数据: [{}]", key, group, ids);
+        Jedis jedis = null;
+        Map<String, StreamEntryID> streams = new HashMap<>();
+        streams.put(key, StreamEntryID.UNRECEIVED_ENTRY);
+        try {
+            jedis = getJedis(serial);
+            return jedis.xack(key, group, ids);
+        } catch (Exception e) {
+            log.logError("redis:xread-group操作出错！", e);
+        } finally {
+            returnResource(jedis);
+        }
+        return -1;
     }
 }
