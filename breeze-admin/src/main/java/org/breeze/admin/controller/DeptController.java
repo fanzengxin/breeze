@@ -5,7 +5,6 @@ import org.breeze.core.annotation.common.AutoAdd;
 import org.breeze.core.annotation.controller.*;
 import org.breeze.core.bean.api.R;
 import org.breeze.core.bean.data.Data;
-import org.breeze.core.bean.data.DataList;
 import org.breeze.core.bean.log.Serial;
 import org.breeze.core.bean.login.LoginInfo;
 import org.breeze.core.constant.ParamFormatCheck;

@@ -17,7 +17,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 /**
  * 非对称加密算法RSA算法组件
  *
- * @author lut
+ * @Author adai
  */
 public class RSAUtil {
 
