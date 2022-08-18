@@ -60,13 +60,10 @@ public class LoginService {
 
     @AutoAdd
     private LoginDao loginDao;
-
     @AutoAdd
     private DeptService deptService;
-
     @AutoAdd
     private RoleService roleService;
-
     @AutoAdd
     private PermissionService permissionService;
 
