@@ -10,12 +10,12 @@ import org.breeze.core.utils.encry.Des3;
 public class Password {
 
     public static void main(String[] args) throws Exception {
-        String aaa = Des3.encode("111111", "breezeABCDSecret");
+        String aaa = Des3.encode("yozosoft2021", "breezeABCDSecret");
         System.out.println(aaa);
         aaa = Des3.decode(aaa, "breezeABCDSecret");
         System.out.println(aaa);
-
-        String bbb = AES.encrypt("111111", "breeze2020Secret");
+        // FElbrFaa6f4mAc8MP44KIQ==
+        String bbb = AES.encrypt("yozosoft2021", "breeze2020Secret");
         System.out.println(bbb);
         bbb = AES.decrypt(bbb, "breeze2020Secret");
         System.out.println(bbb);
