@@ -1,5 +1,7 @@
 package org.breeze.center;
 
+import org.breeze.core.bean.api.R;
+
 /**
  * 服务中心控制类
  *
@@ -10,9 +12,21 @@ package org.breeze.center;
  **/
 public class CenterController {
 
-    public String config() {
+    /**
+     * 获取服务配置信息
+     *
+     * @return
+     */
+    public R config() {
         return null;
     }
 
-
+    /**
+     * 修改服务配置
+     *
+     * @return
+     */
+    public R edit() {
+        return null;
+    }
 }
