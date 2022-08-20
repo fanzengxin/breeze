@@ -9,4 +9,10 @@ package org.breeze.center;
  * @Version V1.0.0
  **/
 public class CenterController {
+
+    public String config() {
+        return null;
+    }
+
+
 }
