@@ -29,4 +29,13 @@ public class CenterController {
     public R edit() {
         return null;
     }
+
+    /**
+     * 发布数据
+     *
+     * @return
+     */
+    public R publish() {
+        return null;
+    }
 }

@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 public class LoginController {
 
     private static Log log = LogFactory.getLog(LoginController.class);
-
     @AutoAdd
     private LoginService loginService;
 

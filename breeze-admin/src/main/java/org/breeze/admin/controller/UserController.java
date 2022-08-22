@@ -23,7 +23,6 @@ import org.breeze.core.log.LogFactory;
 public class UserController {
 
     private static Log log = LogFactory.getLog(UserController.class);
-
     @AutoAdd
     private UserService userService;
 
