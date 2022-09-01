@@ -63,7 +63,7 @@
         <!--freemarker-->
         <freemarker.version>2.3.29</freemarker.version>
         <!--jsoup-->
-        <jsoup.version>1.12.1</jsoup.version>
+        <jsoup.version>1.15.3</jsoup.version>
         <!--minio-->
         <minio.version>8.4.3</minio.version>
     </properties>
