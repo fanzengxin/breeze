@@ -57,7 +57,7 @@
         <!--redis-jedis-->
         <jedis.version>4.2.3</jedis.version>
         <!--yml文件解析-->
-        <yaml.version>1.30</yaml.version>
+        <yaml.version>1.32</yaml.version>
         <!--mariadb-->
         <mariadb.version>3.0.6</mariadb.version>
         <!--freemarker-->
